@@ -30,7 +30,10 @@ try {
     $service = new Service();
 
     $service->registerBeforeEachMatchPlugin(
-       new BearerAuthentication()
+        new BearerAuthentication(
+            'http://localhost/php-oauth-as/introspect.php',
+            'My OAuth API'
+        )
     );
 
     $service->get(
