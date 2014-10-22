@@ -16,7 +16,7 @@
 * limitations under the License.
 */
 
-namespace fkooman\Rest\Plugin;
+namespace fkooman\Rest\Plugin\Bearer;
 
 use fkooman\Http\Request;
 use fkooman\Rest\ServicePluginInterface;

@@ -20,29 +20,117 @@ namespace fkooman\Rest;
 
 use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
+use GuzzleHttp\Client;
+use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Message\Response;
+use GuzzleHttp\Stream\Stream;
 use PHPUnit_Framework_TestCase;
 
 class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 {
-    public function testBearerAuthCorrect()
+    public function testBearerValidToken()
     {
         $request = new Request('http://www.example.org/foo', "GET");
         $request->setHeader("Authorization", "Bearer xyz");
 
-        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
+        $guzzleClient = new Client();
+        $mock = new Mock([
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                Stream::factory(json_encode(
+                    [
+                        "active" => true,
+                        "sub" => "fkooman",
+                    ]
+                ))
+            ),
+        ]);
+        $guzzleClient->getEmitter()->attach($mock);
+        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
         $tokenIntrospection = $bearerAuth->execute($request);
-        $this->assertEquals('foo', $tokenIntrospection->getSub());
+        $this->assertEquals('fkooman', $tokenIntrospection->getSub());
     }
 
     /**
      * @expectedException fkooman\Http\Exception\UnauthorizedException
      * @expectedExceptionMessage invalid_token
      */
-    public function testBearerAuthWrongUser()
+    public function testBearerInvalidToken()
     {
         $request = new Request('http://www.example.org/foo', "GET");
         $request->setHeader("Authorization", "Bearer xyz");
 
+        $guzzleClient = new Client();
+        $mock = new Mock([
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                Stream::factory(json_encode(
+                    [
+                        "active" => false,
+                    ]
+                ))
+            ),
+        ]);
+        $guzzleClient->getEmitter()->attach($mock);
+        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
+        $bearerAuth->execute($request);
+    }
+
+    /**
+     * @expectedException fkooman\Http\Exception\UnauthorizedException
+     * @expectedExceptionMessage invalid_token
+     */
+    public function testBearerNoToken()
+    {
+        $request = new Request('http://www.example.org/foo', "GET");
+        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
+        $bearerAuth->execute($request);
+    }
+
+    /**
+     * @expectedException fkooman\Http\Exception\BadRequestException
+     * @expectedExceptionMessage invalid_request
+     */
+    public function testBearerMalformedToken()
+    {
+        $request = new Request('http://www.example.org/foo', "GET");
+        $request->setHeader("Authorization", "Bearer *");
+        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
+        $bearerAuth->execute($request);
+    }
+
+    public function testBearerQueryParameterToken()
+    {
+        $request = new Request('http://www.example.org/foo?access_token=foo', "GET");
+        $guzzleClient = new Client();
+        $mock = new Mock([
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                Stream::factory(json_encode(
+                    [
+                        "active" => true,
+                        "sub" => "fkooman",
+                    ]
+                ))
+            ),
+        ]);
+        $guzzleClient->getEmitter()->attach($mock);
+        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
+        $tokenIntrospection = $bearerAuth->execute($request);
+        $this->assertEquals('fkooman', $tokenIntrospection->getSub());
+    }
+
+    /**
+     * @expectedException fkooman\Http\Exception\BadRequestException
+     * @expectedExceptionMessage invalid_request
+     */
+    public function testBearerBothHeaderAndQueryParamter()
+    {
+        $request = new Request('http://www.example.org/foo?access_token=foo', "GET");
+        $request->setHeader("Authorization", "Bearer foo");
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
         $bearerAuth->execute($request);
     }
