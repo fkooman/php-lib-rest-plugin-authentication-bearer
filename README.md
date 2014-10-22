@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/fkooman/php-lib-rest-plugin-bearerc.svg?branch=master)](https://travis-ci.org/fkooman/php-lib-rest-plugin-bearer)
+[![Build Status](https://travis-ci.org/fkooman/php-lib-rest-plugin-bearer.svg?branch=master)](https://travis-ci.org/fkooman/php-lib-rest-plugin-bearer)
 
 # Introduction
 This is a plugin for supporting HTTP Bearer Authentication in your REST service 
