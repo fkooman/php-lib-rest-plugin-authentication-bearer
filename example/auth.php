@@ -22,7 +22,7 @@ use fkooman\Http\Exception\HttpException;
 use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Rest\Service;
 use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
-use fkooman\OAuth\Common\TokenIntrospection;
+use fkooman\Rest\Plugin\Bearer\TokenIntrospection;
 
 try {
     $service = new Service();
