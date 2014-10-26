@@ -17,12 +17,10 @@ BuildArch:  noarch
 
 Provides:   php-composer(%{composer_vendor}/%{composer_project}) = %{version}
 
-Requires:   php >= 5.4
+Requires:   php >= 5.3.3
 
-Requires:   php-composer(guzzlehttp/guzzle) >= 4.0
-Requires:   php-composer(guzzlehttp/guzzle) < 5.0
-Requires:   php-composer(guzzlehttp/streams) >= 1.0
-Requires:   php-composer(guzzlehttp/streams) < 2.0
+Requires:   php-composer(guzzle/guzzle) >= 3.9
+Requires:   php-composer(guzzle/guzzle) < 4.0
 
 Requires:   php-composer(fkooman/rest) >= 0.6.2
 Requires:   php-composer(fkooman/rest) < 0.7.0

@@ -23,7 +23,7 @@ use fkooman\Rest\ServicePluginInterface;
 use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
 use fkooman\OAuth\Common\TokenIntrospection;
-use GuzzleHttp\Client;
+use Guzzle\Http\Client;
 
 class BearerAuthentication implements ServicePluginInterface
 {
@@ -103,7 +103,7 @@ class BearerAuthentication implements ServicePluginInterface
                     'token' => $bearerToken,
                 ),
             )
-        );
+        )->send();
 
         $tokenIntrospection = new TokenIntrospection($response->json());
         if (!$tokenIntrospection->isValid()) {

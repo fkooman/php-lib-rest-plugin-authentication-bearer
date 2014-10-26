@@ -20,10 +20,12 @@ namespace fkooman\Rest;
 
 use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
-use GuzzleHttp\Client;
-use GuzzleHttp\Subscriber\Mock;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Stream\Stream;
+use Guzzle\Http\Client;
+#use Guzzle\Http\Subscriber\Mock;
+#use Guzzle\Http\Message\Response;
+#use Guzzle\Http\Stream\Stream;
+use Guzzle\Plugin\Mock\MockPlugin;
+use Guzzle\Http\Message\Response;
 use PHPUnit_Framework_TestCase;
 
 class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
@@ -34,19 +36,20 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $request->setHeader("Authorization", "Bearer xyz");
 
         $guzzleClient = new Client();
-        $mock = new Mock([
-            new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                Stream::factory(json_encode(
-                    [
-                        "active" => true,
-                        "sub" => "fkooman",
-                    ]
-                ))
-            ),
-        ]);
-        $guzzleClient->getEmitter()->attach($mock);
+        $plugin = new MockPlugin();
+        $response = new Response(200);
+        $response->setHeader('Content-Type', 'application/json');
+        $response->setBody(
+            json_encode(
+                array(
+                    "active" => true,
+                    "sub" => "fkooman",
+                )
+            )
+        );
+        $plugin->addResponse($response);
+        $guzzleClient->addSubscriber($plugin);
+
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
         $tokenIntrospection = $bearerAuth->execute($request);
         $this->assertEquals('fkooman', $tokenIntrospection->getSub());
@@ -62,18 +65,19 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $request->setHeader("Authorization", "Bearer xyz");
 
         $guzzleClient = new Client();
-        $mock = new Mock([
-            new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                Stream::factory(json_encode(
-                    [
+        $plugin = new MockPlugin();
+        $response = new Response(200);
+        $response->setHeader('Content-Type', 'application/json');
+        $response->setBody(
+            json_encode(
+                array(
                         "active" => false,
-                    ]
-                ))
-            ),
-        ]);
-        $guzzleClient->getEmitter()->attach($mock);
+                )
+            )
+        );
+        $plugin->addResponse($response);
+        $guzzleClient->addSubscriber($plugin);
+
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
         $bearerAuth->execute($request);
     }
@@ -104,20 +108,22 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testBearerQueryParameterToken()
     {
         $request = new Request('http://www.example.org/foo?access_token=foo', "GET");
+
         $guzzleClient = new Client();
-        $mock = new Mock([
-            new Response(
-                200,
-                ['Content-Type' => 'application/json'],
-                Stream::factory(json_encode(
-                    [
-                        "active" => true,
-                        "sub" => "fkooman",
-                    ]
-                ))
-            ),
-        ]);
-        $guzzleClient->getEmitter()->attach($mock);
+        $plugin = new MockPlugin();
+        $response = new Response(200);
+        $response->setHeader('Content-Type', 'application/json');
+        $response->setBody(
+            json_encode(
+                array(
+                    "active" => true,
+                    "sub" => "fkooman",
+                )
+            )
+        );
+        $plugin->addResponse($response);
+        $guzzleClient->addSubscriber($plugin);
+
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
         $tokenIntrospection = $bearerAuth->execute($request);
         $this->assertEquals('fkooman', $tokenIntrospection->getSub());
