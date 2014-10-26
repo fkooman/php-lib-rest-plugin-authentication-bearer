@@ -1,7 +1,8 @@
 # Release History
 
-## 0.1.2
+## 0.2.0
 - switch back to Guzzle 3.x to support `php >= 5.3.3`
+- include `Scope`, `Entitlement` and `TokenIntrospection` in the plugin now
 
 ## 0.1.1
 - update dependencies

@@ -16,14 +16,10 @@
 * limitations under the License.
 */
 
-namespace fkooman\Rest;
+namespace fkooman\Rest\Plugin\Bearer;
 
 use fkooman\Http\Request;
-use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
 use Guzzle\Http\Client;
-#use Guzzle\Http\Subscriber\Mock;
-#use Guzzle\Http\Message\Response;
-#use Guzzle\Http\Stream\Stream;
 use Guzzle\Plugin\Mock\MockPlugin;
 use Guzzle\Http\Message\Response;
 use PHPUnit_Framework_TestCase;
@@ -32,8 +28,8 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 {
     public function testBearerValidToken()
     {
-        $request = new Request('http://www.example.org/foo', "GET");
-        $request->setHeader("Authorization", "Bearer xyz");
+        $request = new Request('http://www.example.org/foo', 'GET');
+        $request->setHeader('Authorization', 'Bearer xyz');
 
         $guzzleClient = new Client();
         $plugin = new MockPlugin();
@@ -42,8 +38,8 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $response->setBody(
             json_encode(
                 array(
-                    "active" => true,
-                    "sub" => "fkooman",
+                    'active' => true,
+                    'sub' => 'fkooman',
                 )
             )
         );
@@ -61,8 +57,8 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
      */
     public function testBearerInvalidToken()
     {
-        $request = new Request('http://www.example.org/foo', "GET");
-        $request->setHeader("Authorization", "Bearer xyz");
+        $request = new Request('http://www.example.org/foo', 'GET');
+        $request->setHeader('Authorization', 'Bearer xyz');
 
         $guzzleClient = new Client();
         $plugin = new MockPlugin();
@@ -71,7 +67,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $response->setBody(
             json_encode(
                 array(
-                        "active" => false,
+                        'active' => false,
                 )
             )
         );
@@ -88,7 +84,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
      */
     public function testBearerNoToken()
     {
-        $request = new Request('http://www.example.org/foo', "GET");
+        $request = new Request('http://www.example.org/foo', 'GET');
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
         $bearerAuth->execute($request);
     }
@@ -99,15 +95,15 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
      */
     public function testBearerMalformedToken()
     {
-        $request = new Request('http://www.example.org/foo', "GET");
-        $request->setHeader("Authorization", "Bearer *");
+        $request = new Request('http://www.example.org/foo', 'GET');
+        $request->setHeader('Authorization', 'Bearer *');
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
         $bearerAuth->execute($request);
     }
 
     public function testBearerQueryParameterToken()
     {
-        $request = new Request('http://www.example.org/foo?access_token=foo', "GET");
+        $request = new Request('http://www.example.org/foo?access_token=foo', 'GET');
 
         $guzzleClient = new Client();
         $plugin = new MockPlugin();
@@ -116,8 +112,8 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $response->setBody(
             json_encode(
                 array(
-                    "active" => true,
-                    "sub" => "fkooman",
+                    'active' => true,
+                    'sub' => 'fkooman',
                 )
             )
         );
@@ -135,8 +131,8 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
      */
     public function testBearerBothHeaderAndQueryParamter()
     {
-        $request = new Request('http://www.example.org/foo?access_token=foo', "GET");
-        $request->setHeader("Authorization", "Bearer foo");
+        $request = new Request('http://www.example.org/foo?access_token=foo', 'GET');
+        $request->setHeader('Authorization', 'Bearer foo');
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
         $bearerAuth->execute($request);
     }

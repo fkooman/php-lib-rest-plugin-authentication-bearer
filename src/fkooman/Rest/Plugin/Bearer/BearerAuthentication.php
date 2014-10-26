@@ -22,7 +22,6 @@ use fkooman\Http\Request;
 use fkooman\Rest\ServicePluginInterface;
 use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
-use fkooman\OAuth\Common\TokenIntrospection;
 use Guzzle\Http\Client;
 
 class BearerAuthentication implements ServicePluginInterface
