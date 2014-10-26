@@ -15,8 +15,8 @@
     "license": "Apache-2.0",
     "name": "fkooman/rest-plugin-bearer",
     "require": {
-        "fkooman/oauth-common": "~0.6.0",
-        "fkooman/rest": "~0.6.1",
+        "fkooman/oauth-common": "dev-master",
+        "fkooman/rest": "dev-master",
         "guzzlehttp/guzzle": "4.*",
         "php": ">=5.4"
     }

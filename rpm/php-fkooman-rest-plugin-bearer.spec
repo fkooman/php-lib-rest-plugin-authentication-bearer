@@ -24,9 +24,9 @@ Requires:   php-composer(guzzlehttp/guzzle) < 5.0
 Requires:   php-composer(guzzlehttp/streams) >= 1.0
 Requires:   php-composer(guzzlehttp/streams) < 2.0
 
-Requires:   php-composer(fkooman/rest) >= 0.6.0
+Requires:   php-composer(fkooman/rest) >= 0.6.2
 Requires:   php-composer(fkooman/rest) < 0.7.0
-Requires:   php-composer(fkooman/oauth-common) >= 0.6.0
+Requires:   php-composer(fkooman/oauth-common) >= 0.6.1
 Requires:   php-composer(fkooman/oauth-common) < 0.7.0
 
 %description

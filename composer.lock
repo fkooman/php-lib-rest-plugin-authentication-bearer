@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c0aa0f01f180bbc7fb02029dbf45af54",
+    "hash": "ce3caaac5a78868821d1692c99ab84e3",
     "packages": [
         {
             "name": "fkooman/json",
@@ -45,16 +45,16 @@
         },
         {
             "name": "fkooman/oauth-common",
-            "version": "0.6.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-oauth-lib-common.git",
-                "reference": "ee9ba0014e5e99bd2a08dcf3eeb531492386b010"
+                "reference": "a486f57133322f693c071311b71a3f19c98efc6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-oauth-lib-common/zipball/ee9ba0014e5e99bd2a08dcf3eeb531492386b010",
-                "reference": "ee9ba0014e5e99bd2a08dcf3eeb531492386b010",
+                "url": "https://api.github.com/repos/fkooman/php-oauth-lib-common/zipball/a486f57133322f693c071311b71a3f19c98efc6c",
+                "reference": "a486f57133322f693c071311b71a3f19c98efc6c",
                 "shasum": ""
             },
             "require": {
@@ -78,20 +78,20 @@
                 }
             ],
             "description": "PHP library for common OAuth classes.",
-            "time": "2014-10-20 16:25:30"
+            "time": "2014-10-22 19:02:25"
         },
         {
             "name": "fkooman/rest",
-            "version": "0.6.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/fkooman/php-lib-rest.git",
-                "reference": "3a3464df5d01bda08a3dff1f87f3cb4b82418431"
+                "reference": "d485aceac5016e0ba2b0a23842c0f520764ed93f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fkooman/php-lib-rest/zipball/3a3464df5d01bda08a3dff1f87f3cb4b82418431",
-                "reference": "3a3464df5d01bda08a3dff1f87f3cb4b82418431",
+                "url": "https://api.github.com/repos/fkooman/php-lib-rest/zipball/d485aceac5016e0ba2b0a23842c0f520764ed93f",
+                "reference": "d485aceac5016e0ba2b0a23842c0f520764ed93f",
                 "shasum": ""
             },
             "require": {
@@ -122,7 +122,7 @@
                 }
             ],
             "description": "Simple PHP library for writing REST services.",
-            "time": "2014-10-22 12:56:41"
+            "time": "2014-10-26 14:46:50"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -246,7 +246,10 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "fkooman/oauth-common": 20,
+        "fkooman/rest": 20
+    },
     "prefer-stable": false,
     "platform": {
         "php": ">=5.4"
