@@ -95,14 +95,9 @@ class BearerAuthentication implements ServicePluginInterface
 
         // we have a token that has valid syntax, send it to the introspection
         // service
-        $response = $this->guzzleClient->get(
-            $this->introspectionEndpoint,
-            array(
-                'query' => array(
-                    'token' => $bearerToken,
-                ),
-            )
-        )->send();
+        $request = $this->guzzleClient->get($this->introspectionEndpoint);
+        $request->getQuery()->set('token', $bearerToken);
+        $response = $request->send();
 
         $tokenIntrospection = new TokenIntrospection($response->json());
         if (!$tokenIntrospection->isValid()) {
