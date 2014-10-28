@@ -46,13 +46,6 @@ class Scope
         }
     }
 
-    public function hasScope($scopeToken)
-    {
-        $this->validateScopeToken($scopeToken);
-
-        return in_array($scopeToken, $this->scope);
-    }
-
     private function validateScopeToken($scopeToken)
     {
         if (!is_string($scopeToken) || 0 >= strlen($scopeToken)) {
@@ -64,5 +57,27 @@ class Scope
         if (1 !== $result) {
             throw new InvalidArgumentException('invalid characters in scope token');
         }
+    }
+
+    public function hasScope($scopeToken)
+    {
+        $this->validateScopeToken($scopeToken);
+
+        return in_array($scopeToken, $this->scope);
+    }
+
+    public function __toString()
+    {
+        return $this->toString();
+    }
+
+    public function toString()
+    {
+        return implode(" ", $this->scope);
+    }
+
+    public function toArray()
+    {
+        return $this->scope;
     }
 }

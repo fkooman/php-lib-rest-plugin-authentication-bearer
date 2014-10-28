@@ -64,4 +64,19 @@ class ScopeTest extends PHPUnit_Framework_TestCase
     {
         $s = new Scope(5);
     }
+
+    public function testOutput()
+    {
+        $s = new Scope('foo bar baz');
+        $this->assertEquals('bar baz foo', $s->toString());
+        $this->assertEquals('bar baz foo', $s);
+        $this->assertEquals(
+            array(
+                'bar',
+                'baz',
+                'foo',
+            ),
+            $s->toArray()
+        );
+    }
 }

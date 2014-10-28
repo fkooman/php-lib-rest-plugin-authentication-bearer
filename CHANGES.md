@@ -1,5 +1,8 @@
 # Release History
 
+## 0.2.2
+- add `toString()`, `__toString()` and `toArray()` methods
+
 ## 0.2.1
 - set the token in Guzzle 3.x way
 
