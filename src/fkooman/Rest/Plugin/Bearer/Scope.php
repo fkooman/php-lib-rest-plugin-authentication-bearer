@@ -51,10 +51,7 @@ class Scope
         if (!is_string($scopeToken) || 0 >= strlen($scopeToken)) {
             throw new InvalidArgumentException('scope token must be a non-empty string');
         }
-        $scopeTokenRegExp = '/^(?:\x21|[\x23-\x5B]|[\x5D-\x7E])+$/';
-        $result = preg_match($scopeTokenRegExp, $scopeToken);
-
-        if (1 !== $result) {
+        if (1 !== preg_match('/^(?:\x21|[\x23-\x5B]|[\x5D-\x7E])+$/', $scopeToken)) {
             throw new InvalidArgumentException('invalid characters in scope token');
         }
     }
@@ -66,9 +63,9 @@ class Scope
         return in_array($scopeToken, $this->scope);
     }
 
-    public function __toString()
+    public function toArray()
     {
-        return $this->toString();
+        return $this->scope;
     }
 
     public function toString()
@@ -76,8 +73,8 @@ class Scope
         return implode(" ", $this->scope);
     }
 
-    public function toArray()
+    public function __toString()
     {
-        return $this->scope;
+        return $this->toString();
     }
 }
