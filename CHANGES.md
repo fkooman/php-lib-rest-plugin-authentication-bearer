@@ -1,5 +1,8 @@
 # Release History
 
+## 0.3.0
+- update to latest `fkooman/rest` 
+
 ## 0.2.2
 - add `toString()`, `__toString()` and `toArray()` methods
 

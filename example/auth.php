@@ -28,7 +28,7 @@ use fkooman\Rest\Plugin\Bearer\TokenIntrospection;
 try {
     $service = new Service();
 
-    $service->registerBeforeEachMatchPlugin(
+    $service->registerOnMatchPlugin(
         new BearerAuthentication(
             'http://localhost/php-oauth-as/introspect.php',
             'My OAuth API'
@@ -48,12 +48,5 @@ try {
 
     $service->run()->sendResponse();
 } catch (Exception $e) {
-    if ($e instanceof HttpException) {
-        $response = $e->getJsonResponse();
-    } else {
-        // we catch all other (unexpected) exceptions and return a 500
-        $e = new InternalServerErrorException($e->getMessage());
-        $response = $e->getJsonResponse();
-    }
-    $response->sendResponse();
+    Service::handleException($e)->sendResponse();
 }

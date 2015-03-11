@@ -5,7 +5,7 @@
 %global github_name      php-lib-rest-plugin-bearer
 
 Name:       php-%{composer_vendor}-%{composer_project}
-Version:    0.2.1
+Version:    0.3.0
 Release:    1%{?dist}
 Summary:    Bearer Authentication plugin for fkooman/rest
 
@@ -22,8 +22,8 @@ Requires:   php >= 5.3.3
 Requires:   php-composer(guzzle/guzzle) >= 3.9
 Requires:   php-composer(guzzle/guzzle) < 4.0
 
-Requires:   php-composer(fkooman/rest) >= 0.6.2
-Requires:   php-composer(fkooman/rest) < 0.7.0
+Requires:   php-composer(fkooman/rest) >= 0.7.1
+Requires:   php-composer(fkooman/rest) < 0.8.0
 
 %description
 Library written in PHP to make it easy to develop REST applications.
@@ -44,6 +44,9 @@ cp -pr src/* ${RPM_BUILD_ROOT}%{_datadir}/php
 %doc README.md CHANGES.md COPYING composer.json
 
 %changelog
+* Wed Mar 11 2015 François Kooman <fkooman@tuxed.net> - 0.3.0-1
+- update to 0.3.0
+
 * Mon Oct 27 2014 François Kooman <fkooman@tuxed.net> - 0.2.1-1
 - update to 0.2.1
 

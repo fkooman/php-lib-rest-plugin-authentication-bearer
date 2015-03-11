@@ -29,7 +29,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testBearerValidToken()
     {
         $request = new Request('http://www.example.org/foo', 'GET');
-        $request->setHeader('Authorization', 'Bearer xyz');
+        $request->setHeaders(array('Authorization' => 'Bearer xyz'));
 
         $guzzleClient = new Client();
         $plugin = new MockPlugin();
@@ -58,7 +58,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testBearerInvalidToken()
     {
         $request = new Request('http://www.example.org/foo', 'GET');
-        $request->setHeader('Authorization', 'Bearer xyz');
+        $request->setHeaders(array('Authorization' => 'Bearer xyz'));
 
         $guzzleClient = new Client();
         $plugin = new MockPlugin();
@@ -96,7 +96,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testBearerMalformedToken()
     {
         $request = new Request('http://www.example.org/foo', 'GET');
-        $request->setHeader('Authorization', 'Bearer *');
+        $request->setHeaders(array('Authorization' => 'Bearer *'));
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
         $bearerAuth->execute($request);
     }
@@ -108,7 +108,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $guzzleClient = new Client();
         $plugin = new MockPlugin();
         $response = new Response(200);
-        $response->setHeader('Content-Type', 'application/json');
+        $response->setHeaders(array('Content-Type' => 'application/json'));
         $response->setBody(
             json_encode(
                 array(
@@ -132,7 +132,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testBearerBothHeaderAndQueryParamter()
     {
         $request = new Request('http://www.example.org/foo?access_token=foo', 'GET');
-        $request->setHeader('Authorization', 'Bearer foo');
+        $request->setHeaders(array('Authorization' => 'Bearer foo'));
         $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
         $bearerAuth->execute($request);
     }

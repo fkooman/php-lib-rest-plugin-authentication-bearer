@@ -67,7 +67,7 @@ class BearerAuthentication implements ServicePluginInterface
                 'invalid_token',
                 'no token provided',
                 'Bearer',
-                array (
+                array(
                     'realm' => $this->bearerAuthRealm,
                 )
             );
