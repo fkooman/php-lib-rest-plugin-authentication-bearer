@@ -45,8 +45,15 @@ class BearerAuthentication implements ServicePluginInterface
         $this->guzzleClient = $guzzleClient;
     }
 
-    public function execute(Request $request)
+    public function execute(Request $request, array $routeConfig)
     {
+        $requireAuth = true;
+        if (array_key_exists('requireAuth', $routeConfig)) {
+            if (!$routeConfig['requireAuth']) {
+                $requireAuth = false;
+            }
+        }
+
         $headerFound = false;
         $queryParameterFound = false;
 
@@ -63,6 +70,9 @@ class BearerAuthentication implements ServicePluginInterface
 
         if (!$headerFound && !$queryParameterFound) {
             // none found
+            if (!$requireAuth) {
+                return false;
+            }
             throw new UnauthorizedException(
                 'invalid_token',
                 'no token provided',
@@ -101,6 +111,9 @@ class BearerAuthentication implements ServicePluginInterface
 
         $tokenIntrospection = new TokenIntrospection($response->json());
         if (!$tokenIntrospection->isValid()) {
+            if (!$requireAuth) {
+                return false;
+            }
             throw new UnauthorizedException(
                 'invalid_token',
                 'token is invalid or expired',
