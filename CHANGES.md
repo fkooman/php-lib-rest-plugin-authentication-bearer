@@ -2,8 +2,8 @@
 
 ## 0.4.0
 - rename `TokenIntrospection` to `TokenInfo`
-- allow for alternative verification backend, include introspection backend,
-  see example on how to use it
+- allow for alternative verification backend, include introspection backend 
+  with using username/password and bearer token, see example on how to use it
 - remove entitlement support
 - rewrite `TokenInfo` to be more complete according to 
   `draft-ietf-oauth-introspection`, remove most of the token checking, only 

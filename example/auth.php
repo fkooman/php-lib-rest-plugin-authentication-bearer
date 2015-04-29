@@ -23,7 +23,7 @@ use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Service;
 use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
-use fkooman\Rest\Plugin\Bearer\IntrospectionValidator;
+use fkooman\Rest\Plugin\Bearer\IntrospectionUserPassValidator;
 use fkooman\Rest\Plugin\Bearer\TokenInfo;
 
 try {
@@ -31,7 +31,7 @@ try {
 
     $service->registerOnMatchPlugin(
         new BearerAuthentication(
-            new IntrospectionValidator(
+            new IntrospectionUserPassValidator(
                 'http://localhost/php-oauth-as/introspect.php',
                 'foo',
                 'bar'
