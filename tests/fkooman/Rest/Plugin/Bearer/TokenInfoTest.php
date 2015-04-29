@@ -20,11 +20,11 @@ namespace fkooman\Rest\Plugin\Bearer;
 
 use PHPUnit_Framework_TestCase;
 
-class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
+class TokenInfoTest extends PHPUnit_Framework_TestCase
 {
     public function testNotActive()
     {
-        $t = new TokenIntrospection(array('active' => false));
+        $t = new TokenInfo(array('active' => false));
         $this->assertFalse($t->getActive());
     }
 
@@ -32,7 +32,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
     {
         $now = time();
 
-        $t = new TokenIntrospection(
+        $t = new TokenInfo(
             array(
                 'active' => true,
                 'exp' => $now + 1000,
@@ -61,7 +61,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
 
     public function testActive()
     {
-        $t = new TokenIntrospection(array('active' => true));
+        $t = new TokenInfo(array('active' => true));
         $this->assertTrue($t->getActive());
         // non exiting key should return null
         $this->assertNull($t->getSub());
@@ -73,7 +73,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testMissingActive()
     {
-        $t = new TokenIntrospection(array());
+        $t = new TokenInfo(array());
     }
 
     /**
@@ -82,7 +82,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testIssueTimeInFuture()
     {
-        $t = new TokenIntrospection(array('active' => true, 'iat' => time()+1000));
+        $t = new TokenInfo(array('active' => true, 'iat' => time()+1000));
     }
 
     /**
@@ -91,7 +91,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testExpiresBeforeIssued()
     {
-        $t = new TokenIntrospection(array('active' => true, 'iat' => time()-500, 'exp' => time()-1000));
+        $t = new TokenInfo(array('active' => true, 'iat' => time()-500, 'exp' => time()-1000));
     }
 
     /**
@@ -100,7 +100,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testNegativeIssueTime()
     {
-        $t = new TokenIntrospection(array('active' => true, 'iat' => -4));
+        $t = new TokenInfo(array('active' => true, 'iat' => -4));
     }
 
     /**
@@ -109,7 +109,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testNonIntIssueTime()
     {
-        $t = new TokenIntrospection(array('active' => true, 'iat' => '1234567'));
+        $t = new TokenInfo(array('active' => true, 'iat' => '1234567'));
     }
 
     /**
@@ -118,7 +118,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testNonIntExpiryTime()
     {
-        $t = new TokenIntrospection(array('active' => true, 'exp' => '1234567'));
+        $t = new TokenInfo(array('active' => true, 'exp' => '1234567'));
     }
     /**
      * @expectedException InvalidArgumentException
@@ -126,7 +126,7 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testNonStringScope()
     {
-        $t = new TokenIntrospection(array('active' => true, 'scope' => 123));
+        $t = new TokenInfo(array('active' => true, 'scope' => 123));
     }
 
     /**
@@ -135,24 +135,24 @@ class TokenIntrospectionTest extends PHPUnit_Framework_TestCase
      */
     public function testNegativeExpiryTime()
     {
-        $t = new TokenIntrospection(array('active' => true, 'exp' => -4));
+        $t = new TokenInfo(array('active' => true, 'exp' => -4));
     }
 
     public function testExpiredToken()
     {
-        $t = new TokenIntrospection(array('active' => true, 'exp' => time() - 100));
+        $t = new TokenInfo(array('active' => true, 'exp' => time() - 100));
         $this->assertFalse($t->isValid());
     }
 
     public function testNonExpiredToken()
     {
-        $t = new TokenIntrospection(array('active' => true, 'exp' => time() + 100));
+        $t = new TokenInfo(array('active' => true, 'exp' => time() + 100));
         $this->assertTrue($t->isValid());
     }
 
     public function testNonExpiredNonActiveToken()
     {
-        $t = new TokenIntrospection(array('active' => false, 'exp' => time() + 100));
+        $t = new TokenInfo(array('active' => false, 'exp' => time() + 100));
         $this->assertFalse($t->isValid());
     }
 }

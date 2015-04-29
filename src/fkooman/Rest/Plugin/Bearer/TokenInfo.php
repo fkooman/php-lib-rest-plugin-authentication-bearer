@@ -20,7 +20,7 @@ namespace fkooman\Rest\Plugin\Bearer;
 
 use InvalidArgumentException;
 
-class TokenIntrospection
+class TokenInfo
 {
     /** @var array */
     private $response;

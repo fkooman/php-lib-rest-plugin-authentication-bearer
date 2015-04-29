@@ -23,7 +23,7 @@ use fkooman\Http\Exception\InternalServerErrorException;
 use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Service;
 use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
-use fkooman\Rest\Plugin\Bearer\TokenIntrospection;
+use fkooman\Rest\Plugin\Bearer\TokenInfo;
 
 try {
     $service = new Service();
@@ -37,7 +37,7 @@ try {
 
     $service->get(
         '/getMyUserId',
-        function (TokenIntrospection $u) {
+        function (TokenInfo $u) {
             if (!$u->getScope()->hasScope('userid')) {
                 throw new ForbiddenException('insufficient_scope', 'scope "userid" needed');
             }

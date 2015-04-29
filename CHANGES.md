@@ -1,5 +1,8 @@
 # Release History
 
+## 0.4.0
+- rename `TokenIntrospection` to `TokenInfo`
+
 ## 0.3.1
 - update to latest `fkooman/rest` to support optional authentication
 

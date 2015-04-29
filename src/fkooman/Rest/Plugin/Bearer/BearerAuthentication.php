@@ -109,8 +109,8 @@ class BearerAuthentication implements ServicePluginInterface
         $request->getQuery()->set('token', $bearerToken);
         $response = $request->send();
 
-        $tokenIntrospection = new TokenIntrospection($response->json());
-        if (!$tokenIntrospection->isValid()) {
+        $tokenInfo = new TokenInfo($response->json());
+        if (!$tokenInfo->isValid()) {
             if (!$requireAuth) {
                 return false;
             }
@@ -126,7 +126,7 @@ class BearerAuthentication implements ServicePluginInterface
             );
         }
 
-        return $tokenIntrospection;
+        return $tokenInfo;
     }
 
     private function isValidTokenSyntax($bearerToken)
