@@ -22,7 +22,7 @@ Requires:   php >= 5.3.3
 Requires:   php-composer(guzzle/guzzle) >= 3.9
 Requires:   php-composer(guzzle/guzzle) < 4.0
 
-Requires:   php-composer(fkooman/rest) >= 0.8.0
+Requires:   php-composer(fkooman/rest) >= 0.8.1
 Requires:   php-composer(fkooman/rest) < 0.9.0
 
 %description
