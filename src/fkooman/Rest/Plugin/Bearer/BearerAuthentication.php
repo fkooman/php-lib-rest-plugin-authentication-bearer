@@ -22,27 +22,19 @@ use fkooman\Http\Request;
 use fkooman\Rest\ServicePluginInterface;
 use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
-use Guzzle\Http\Client;
 
 class BearerAuthentication implements ServicePluginInterface
 {
-    /** @var string */
-    private $introspectionEndpoint;
+    /** @var fkooman\Rest\Plugin\ValidatorInterface */
+    private $validator;
 
     /** @var string */
     private $bearerAuthRealm;
 
-    /** @var GuzzleHttp\Client */
-    private $guzzleClient;
-
-    public function __construct($introspectionEndpoint, $bearerAuthRealm = 'Protected Resource', Client $guzzleClient = null)
+    public function __construct(ValidatorInterface $validator, $bearerAuthRealm = 'Protected Resource')
     {
-        $this->introspectionEndpoint = $introspectionEndpoint;
         $this->bearerAuthRealm = $bearerAuthRealm;
-        if (null === $guzzleClient) {
-            $guzzleClient = new Client();
-        }
-        $this->guzzleClient = $guzzleClient;
+        $this->validator = $validator;
     }
 
     public function execute(Request $request, array $routeConfig)
@@ -103,14 +95,13 @@ class BearerAuthentication implements ServicePluginInterface
             );
         }
 
-        // we have a token that has valid syntax, send it to the introspection
-        // service
-        $request = $this->guzzleClient->get($this->introspectionEndpoint);
-        $request->getQuery()->set('token', $bearerToken);
-        $response = $request->send();
+        // call the registered validator
+        $tokenInfo = $this->validator->validate($bearerToken);
+        if (!($tokenInfo instanceof TokenInfo)) {
+            throw new UnexpectedValueException('invalid response of validate method');
+        }
 
-        $tokenInfo = new TokenInfo($response->json());
-        if (!$tokenInfo->isValid()) {
+        if (!$tokenInfo->get('active')) {
             if (!$requireAuth) {
                 return false;
             }

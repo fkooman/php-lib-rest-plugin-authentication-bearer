@@ -46,9 +46,12 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $plugin->addResponse($response);
         $guzzleClient->addSubscriber($plugin);
 
-        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
+        $bearerAuth = new BearerAuthentication(
+            new IntrospectionValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
+            'My Realm'
+        );
         $tokenIntrospection = $bearerAuth->execute($request, array());
-        $this->assertEquals('fkooman', $tokenIntrospection->getSub());
+        $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
     }
 
     /**
@@ -74,7 +77,10 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $plugin->addResponse($response);
         $guzzleClient->addSubscriber($plugin);
 
-        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
+        $bearerAuth = new BearerAuthentication(
+            new IntrospectionValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
+            'My Realm'
+        );
         $bearerAuth->execute($request, array());
     }
 
@@ -85,7 +91,10 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testBearerNoToken()
     {
         $request = new Request('http://www.example.org/foo', 'GET');
-        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
+        $bearerAuth = new BearerAuthentication(
+            new IntrospectionValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
+            'My Realm'
+        );
         $bearerAuth->execute($request, array());
     }
 
@@ -97,7 +106,10 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     {
         $request = new Request('http://www.example.org/foo', 'GET');
         $request->setHeaders(array('Authorization' => 'Bearer *'));
-        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
+        $bearerAuth = new BearerAuthentication(
+            new IntrospectionValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
+            'My Realm'
+        );
         $bearerAuth->execute($request, array());
     }
 
@@ -120,9 +132,12 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $plugin->addResponse($response);
         $guzzleClient->addSubscriber($plugin);
 
-        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm', $guzzleClient);
+        $bearerAuth = new BearerAuthentication(
+            new IntrospectionValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
+            'My Realm'
+        );
         $tokenIntrospection = $bearerAuth->execute($request, array());
-        $this->assertEquals('fkooman', $tokenIntrospection->getSub());
+        $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
     }
 
     /**
@@ -133,7 +148,10 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     {
         $request = new Request('http://www.example.org/foo?access_token=foo', 'GET');
         $request->setHeaders(array('Authorization' => 'Bearer foo'));
-        $bearerAuth = new BearerAuthentication('http://localhost/php-oauth-as/introspect.php', 'My Realm');
+        $bearerAuth = new BearerAuthentication(
+            new IntrospectionValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
+            'My Realm'
+        );
         $bearerAuth->execute($request, array());
     }
 }

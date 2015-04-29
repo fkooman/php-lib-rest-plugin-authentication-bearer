@@ -2,6 +2,12 @@
 
 ## 0.4.0
 - rename `TokenIntrospection` to `TokenInfo`
+- allow for alternative verification backend, include introspection backend,
+  see example on how to use it
+- remove entitlement support
+- rewrite `TokenInfo` to be more complete according to 
+  `draft-ietf-oauth-introspection`, remove most of the token checking, only 
+  check the type of the fields and require `active` to be present.
 
 ## 0.3.1
 - update to latest `fkooman/rest` to support optional authentication

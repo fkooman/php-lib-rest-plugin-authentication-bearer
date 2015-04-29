@@ -25,7 +25,7 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
     public function testNotActive()
     {
         $t = new TokenInfo(array('active' => false));
-        $this->assertFalse($t->getActive());
+        $this->assertFalse($t->get('active'));
     }
 
     public function testComplete()
@@ -42,34 +42,30 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
                 'aud' => 'foobar',
                 'scope' => 'foo bar baz',
                 'token_type' => 'bearer',
-                'x-entitlement' => 'fooe bare baze',
                 'x-ext' => array('proprietary', 'extension', 'data'),
             )
         );
-        $this->assertTrue($t->getActive());
-        $this->assertEquals($now + 1000, $t->getExpiresAt());
-        $this->assertEquals($now - 1000, $t->getIssuedAt());
-        $this->assertEquals('foo', $t->getSub());
-        $this->assertEquals('bar', $t->getClientId());
-        $this->assertEquals('foobar', $t->getAud());
+        $this->assertTrue($t->get('active'));
+        $this->assertEquals($now + 1000, $t->get('exp'));
+        $this->assertEquals($now - 1000, $t->get('iat'));
+        $this->assertEquals('foo', $t->get('sub'));
+        $this->assertEquals('bar', $t->get('client_id'));
+        $this->assertEquals('foobar', $t->get('aud'));
         $this->assertTrue($t->getScope()->hasScope('foo'));
-        $this->assertTrue($t->getEntitlement()->hasEntitlement('fooe'));
-        $this->assertEquals('bearer', $t->getTokenType());
-        $token = $t->getToken();
-        $this->assertEquals(array('proprietary', 'extension', 'data'), $token['x-ext']);
+        $this->assertEquals('bearer', $t->get('token_type'));
     }
 
     public function testActive()
     {
         $t = new TokenInfo(array('active' => true));
-        $this->assertTrue($t->getActive());
+        $this->assertTrue($t->get('active'));
         // non exiting key should return null
-        $this->assertNull($t->getSub());
+        $this->assertNull($t->get('sub'));
     }
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage active key should be set and its value a boolean
+     * @expectedExceptionMessage active key missing
      */
     public function testMissingActive()
     {
@@ -78,34 +74,7 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage token issued in the future
-     */
-    public function testIssueTimeInFuture()
-    {
-        $t = new TokenInfo(array('active' => true, 'iat' => time()+1000));
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage token expired before it was issued
-     */
-    public function testExpiresBeforeIssued()
-    {
-        $t = new TokenInfo(array('active' => true, 'iat' => time()-500, 'exp' => time()-1000));
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage iat value must be positive integer
-     */
-    public function testNegativeIssueTime()
-    {
-        $t = new TokenInfo(array('active' => true, 'iat' => -4));
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage iat value must be positive integer
+     * @expectedExceptionMessage "iat" fails "is_int" check
      */
     public function testNonIntIssueTime()
     {
@@ -114,45 +83,10 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage exp value must be positive integer
-     */
-    public function testNonIntExpiryTime()
-    {
-        $t = new TokenInfo(array('active' => true, 'exp' => '1234567'));
-    }
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage scope must be string
+     * @expectedExceptionMessage "scope" fails "is_string" check
      */
     public function testNonStringScope()
     {
         $t = new TokenInfo(array('active' => true, 'scope' => 123));
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage exp value must be positive integer
-     */
-    public function testNegativeExpiryTime()
-    {
-        $t = new TokenInfo(array('active' => true, 'exp' => -4));
-    }
-
-    public function testExpiredToken()
-    {
-        $t = new TokenInfo(array('active' => true, 'exp' => time() - 100));
-        $this->assertFalse($t->isValid());
-    }
-
-    public function testNonExpiredToken()
-    {
-        $t = new TokenInfo(array('active' => true, 'exp' => time() + 100));
-        $this->assertTrue($t->isValid());
-    }
-
-    public function testNonExpiredNonActiveToken()
-    {
-        $t = new TokenInfo(array('active' => false, 'exp' => time() + 100));
-        $this->assertFalse($t->isValid());
     }
 }
