@@ -1,5 +1,8 @@
 # Release History
 
+## 0.4.1
+- fix `IntrospectionBearerValidator`
+
 ## 0.4.0
 - rename `TokenIntrospection` to `TokenInfo`
 - allow for alternative verification backend, include introspection backend 
