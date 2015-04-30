@@ -102,9 +102,6 @@ class BearerAuthentication implements ServicePluginInterface
         }
 
         if (!$tokenInfo->get('active')) {
-            if (!$requireAuth) {
-                return false;
-            }
             throw new UnauthorizedException(
                 'invalid_token',
                 'token is invalid or expired',

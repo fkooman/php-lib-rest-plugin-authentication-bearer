@@ -154,4 +154,41 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         );
         $bearerAuth->execute($request, array());
     }
+   
+    public function testOptionalAuthWithoutAttempt()
+    {
+        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Bearer\ValidatorInterface')
+                     ->setMockClassName('MyValidator')
+                     ->getMock();
+        $stub->method('validate')
+             ->willReturn(new TokenInfo(array('active' => false)));
+
+        $b = new BearerAuthentication(
+            $stub, 'Realm'
+        );
+
+        $request = new Request('http://localhost/php-oauth-as/introspect.php', 'POST');
+        $request->setPostParameters(array('token' => 'foo'));
+        $this->assertFalse($b->execute($request, array('requireAuth' => false)));
+    }
+
+    /**
+     * @expectedException fkooman\Http\Exception\UnauthorizedException
+     * @expectedExceptionMessage invalid_token
+     */
+    public function testOptionalAuthWithAttempt()
+    {
+        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Bearer\ValidatorInterface')
+                     ->setMockClassName('MyValidator')
+                     ->getMock();
+        $stub->method('validate')
+             ->willReturn(new TokenInfo(array('active' => false)));
+
+        $b = new BearerAuthentication($stub);
+
+        $request = new Request('http://localhost/php-oauth-as/introspect.php', 'POST');
+        $request->setHeaders(array('Authorization' => 'Bearer xyz'));
+        $request->setPostParameters(array('token' => 'foo'));
+        $b->execute($request, array('requireAuth' => false));
+    }
 }
