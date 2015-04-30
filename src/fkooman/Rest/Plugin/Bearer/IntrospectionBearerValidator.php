@@ -44,7 +44,7 @@ class IntrospectionBearerValidator implements ValidatorInterface
 
     public function validate($bearerToken)
     {
-        $request = $client->post(
+        $request = $this->client->post(
             $this->endpoint,
             array('Authorization' => sprintf('Bearer %s', $this->bearerToken)),
             array(
