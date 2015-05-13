@@ -22,6 +22,7 @@ use fkooman\Http\Request;
 use fkooman\Rest\ServicePluginInterface;
 use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
+use UnexpectedValueException;
 
 class BearerAuthentication implements ServicePluginInterface
 {
