@@ -1,5 +1,8 @@
 # Release History
 
+## 0.5.0
+- update `fkooman/rest`
+
 ## 0.4.2
 - update `fkooman/rest`
 - fix missing exception use

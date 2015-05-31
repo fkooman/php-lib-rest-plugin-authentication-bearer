@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  Copyright 2014 François Kooman <fkooman@tuxed.net>
+ *  Copyright 2014 François Kooman <fkooman@tuxed.net>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace fkooman\Rest\Plugin\Bearer;
 
 use InvalidArgumentException;
@@ -39,7 +38,7 @@ class TokenInfo
             'sub' => 'is_string',
             'aud' => 'is_string',
             'iss' => 'is_string',
-            'jti' => 'is_string'
+            'jti' => 'is_string',
         );
 
         // active key MUST exist
@@ -66,7 +65,8 @@ class TokenInfo
         if (array_key_exists($key, $this->response)) {
             return $this->response[$key];
         }
-        return null;
+
+        return;
     }
 
     public function getScope()
