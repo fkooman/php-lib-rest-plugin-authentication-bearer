@@ -55,7 +55,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 
         $bearerAuth = new BearerAuthentication(
             new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
-            'My Realm'
+            array('realm' => 'My Realm')
         );
         $tokenIntrospection = $bearerAuth->execute($request, array());
         $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
@@ -94,7 +94,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 
         $bearerAuth = new BearerAuthentication(
             new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
-            'My Realm'
+            array('realm' => 'My Realm')
         );
         $bearerAuth->execute($request, array());
     }
@@ -117,7 +117,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         );
         $bearerAuth = new BearerAuthentication(
             new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
-            'My Realm'
+            array('realm' => 'My Realm')
         );
         $bearerAuth->execute($request, array());
     }
@@ -141,7 +141,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         );
         $bearerAuth = new BearerAuthentication(
             new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
-            'My Realm'
+            array('realm' => 'My Realm')
         );
         $bearerAuth->execute($request, array());
     }
@@ -175,7 +175,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 
         $bearerAuth = new BearerAuthentication(
             new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
-            'My Realm'
+            array('realm' => 'My Realm')
         );
         $tokenIntrospection = $bearerAuth->execute($request, array());
         $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
@@ -200,7 +200,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         );
         $bearerAuth = new BearerAuthentication(
             new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
-            'My Realm'
+            array('realm' => 'My Realm')
         );
         $bearerAuth->execute($request, array());
     }
@@ -214,7 +214,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
              ->willReturn(new TokenInfo(array('active' => false)));
 
         $b = new BearerAuthentication(
-            $stub, 'Realm'
+            $stub, array('realm' => 'Realm')
         );
 
         $request = new Request(

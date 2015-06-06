@@ -28,13 +28,16 @@ class BearerAuthentication implements ServicePluginInterface
     /** @var fkooman\Rest\Plugin\ValidatorInterface */
     private $validator;
 
-    /** @var string */
-    private $bearerAuthRealm;
+    /** @var array */
+    private $authParams;
 
-    public function __construct(ValidatorInterface $validator, $bearerAuthRealm = 'Protected Resource')
+    public function __construct(ValidatorInterface $validator, $authParams = array())
     {
-        $this->bearerAuthRealm = $bearerAuthRealm;
         $this->validator = $validator;
+        if (!array_key_exists('realm', $authParams)) {
+            $authParams['realm'] = 'Protected Resource';
+        }
+        $this->authParams = $authParams;
     }
 
     public function execute(Request $request, array $routeConfig)
@@ -69,9 +72,7 @@ class BearerAuthentication implements ServicePluginInterface
                 'invalid_token',
                 'no token provided',
                 'Bearer',
-                array(
-                    'realm' => $this->bearerAuthRealm,
-                )
+                $this->authParams
             );
         }
         if ($headerFound && $queryParameterFound) {
@@ -101,16 +102,17 @@ class BearerAuthentication implements ServicePluginInterface
             throw new UnexpectedValueException('invalid response of validate method');
         }
 
+        $errorParams = array(
+            'error' => 'invalid_token',
+            'error_description' => 'token is invalid or expired',
+        );
+
         if (!$tokenInfo->get('active')) {
             throw new UnauthorizedException(
                 'invalid_token',
                 'token is invalid or expired',
                 'Bearer',
-                array(
-                    'realm' => $this->bearerAuthRealm,
-                    'error' => 'invalid_token',
-                    'error_description' => 'token is invalid or expired',
-                )
+                array_merge($this->authParams, $errorParams)
             );
         }
 
