@@ -185,7 +185,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
      * @expectedException fkooman\Http\Exception\BadRequestException
      * @expectedExceptionMessage invalid_request
      */
-    public function testBearerBothHeaderAndQueryParamter()
+    public function testBearerBothHeaderAndQueryParameter()
     {
         $request = new Request(
             array(
