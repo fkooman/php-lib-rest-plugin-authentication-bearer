@@ -37,7 +37,7 @@ $pluginRegistry->registerDefaultPlugin(
             'foo',
             'bar'
         ),
-        'My OAuth API'
+        array('realm' => 'My OAuth API')
     )
 );
 $service->setPluginRegistry($pluginRegistry);
@@ -53,4 +53,4 @@ $service->get(
     }
 );
 
-$service->run()->sendResponse();
+$service->run()->send();
