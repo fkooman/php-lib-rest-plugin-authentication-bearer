@@ -31,7 +31,7 @@ class IntrospectionUserPassValidator implements ValidatorInterface
     /** @var string */
     private $password;
 
-    /** @var Guzzle\Http\Client */
+    /** @var \Guzzle\Http\Client */
     private $client;
 
     public function __construct($endpoint, $userid, $password, Client $client = null)

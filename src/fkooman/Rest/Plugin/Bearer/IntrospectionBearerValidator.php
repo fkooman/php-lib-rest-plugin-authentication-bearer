@@ -28,7 +28,7 @@ class IntrospectionBearerValidator implements ValidatorInterface
     /** @var string */
     private $bearerToken;
 
-    /** @var Guzzle\Http\Client */
+    /** @var \Guzzle\Http\Client */
     private $client;
 
     public function __construct($endpoint, $bearerToken, Client $client = null)

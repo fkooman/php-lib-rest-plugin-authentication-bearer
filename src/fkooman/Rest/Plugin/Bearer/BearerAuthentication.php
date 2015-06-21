@@ -26,7 +26,7 @@ use UnexpectedValueException;
 
 class BearerAuthentication implements AuthenticationPluginInterface
 {
-    /** @var ValidatorInterface */
+    /** @var \fkooman\Rest\Plugin\Bearer\ValidatorInterface */
     private $validator;
 
     /** @var array */
