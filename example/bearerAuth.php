@@ -21,6 +21,13 @@ use fkooman\Http\Exception\ForbiddenException;
 use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
 use fkooman\Rest\Plugin\Bearer\IntrospectionUserPassValidator;
 use fkooman\Rest\Plugin\Bearer\TokenInfo;
+use fkooman\Rest\Service;
+use fkooman\Rest\PluginRegistry;
+use fkooman\Rest\ExceptionHandler;
+
+ExceptionHandler::register();
+
+$service = new Service();
 
 $pluginRegistry = new PluginRegistry();
 $pluginRegistry->registerDefaultPlugin(

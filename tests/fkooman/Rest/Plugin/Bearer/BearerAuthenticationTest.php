@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace fkooman\Rest\Plugin\Bearer;
 
 use fkooman\Http\Request;
@@ -101,7 +102,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 
     /**
      * @expectedException fkooman\Http\Exception\UnauthorizedException
-     * @expectedExceptionMessage invalid_token
+     * @expectedExceptionMessage no_credentials
      */
     public function testBearerNoToken()
     {
@@ -146,64 +147,64 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
         $bearerAuth->execute($request, array());
     }
 
-    public function testBearerQueryParameterToken()
-    {
-        $request = new Request(
-            array(
-                'SERVER_NAME' => 'www.example.org',
-                'SERVER_PORT' => 80,
-                'QUERY_STRING' => 'access_token=foo',
-                'REQUEST_URI' => '/?access_token=foo',
-                'SCRIPT_NAME' => '/index.php',
-                'REQUEST_METHOD' => 'GET',
-            )
-        );
-        $guzzleClient = new Client();
-        $plugin = new MockPlugin();
-        $response = new Response(200);
-        $response->setHeaders(array('Content-Type' => 'application/json'));
-        $response->setBody(
-            json_encode(
-                array(
-                    'active' => true,
-                    'sub' => 'fkooman',
-                )
-            )
-        );
-        $plugin->addResponse($response);
-        $guzzleClient->addSubscriber($plugin);
+#    public function testBearerQueryParameterToken()
+#    {
+#        $request = new Request(
+#            array(
+#                'SERVER_NAME' => 'www.example.org',
+#                'SERVER_PORT' => 80,
+#                'QUERY_STRING' => 'access_token=foo',
+#                'REQUEST_URI' => '/?access_token=foo',
+#                'SCRIPT_NAME' => '/index.php',
+#                'REQUEST_METHOD' => 'GET',
+#            )
+#        );
+#        $guzzleClient = new Client();
+#        $plugin = new MockPlugin();
+#        $response = new Response(200);
+#        $response->setHeaders(array('Content-Type' => 'application/json'));
+#        $response->setBody(
+#            json_encode(
+#                array(
+#                    'active' => true,
+#                    'sub' => 'fkooman',
+#                )
+#            )
+#        );
+#        $plugin->addResponse($response);
+#        $guzzleClient->addSubscriber($plugin);
 
-        $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
-            array('realm' => 'My Realm')
-        );
-        $tokenIntrospection = $bearerAuth->execute($request, array());
-        $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
-    }
+#        $bearerAuth = new BearerAuthentication(
+#            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
+#            array('realm' => 'My Realm')
+#        );
+#        $tokenIntrospection = $bearerAuth->execute($request, array());
+#        $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
+#    }
 
-    /**
-     * @expectedException fkooman\Http\Exception\BadRequestException
-     * @expectedExceptionMessage invalid_request
-     */
-    public function testBearerBothHeaderAndQueryParameter()
-    {
-        $request = new Request(
-            array(
-                'SERVER_NAME' => 'www.example.org',
-                'SERVER_PORT' => 80,
-                'QUERY_STRING' => 'access_token=foo',
-                'REQUEST_URI' => '/?access_token=foo',
-                'SCRIPT_NAME' => '/index.php',
-                'REQUEST_METHOD' => 'GET',
-                'HTTP_AUTHORIZATION' => 'Bearer foo',
-            )
-        );
-        $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
-            array('realm' => 'My Realm')
-        );
-        $bearerAuth->execute($request, array());
-    }
+#    /**
+#     * @expectedException fkooman\Http\Exception\BadRequestException
+#     * @expectedExceptionMessage invalid_request
+#     */
+#    public function testBearerBothHeaderAndQueryParameter()
+#    {
+#        $request = new Request(
+#            array(
+#                'SERVER_NAME' => 'www.example.org',
+#                'SERVER_PORT' => 80,
+#                'QUERY_STRING' => 'access_token=foo',
+#                'REQUEST_URI' => '/?access_token=foo',
+#                'SCRIPT_NAME' => '/index.php',
+#                'REQUEST_METHOD' => 'GET',
+#                'HTTP_AUTHORIZATION' => 'Bearer foo',
+#            )
+#        );
+#        $bearerAuth = new BearerAuthentication(
+#            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
+#            array('realm' => 'My Realm')
+#        );
+#        $bearerAuth->execute($request, array());
+#    }
 
     public function testOptionalAuthWithoutAttempt()
     {
@@ -227,7 +228,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'REQUEST_METHOD' => 'GET',
             )
         );
-        $this->assertFalse($b->execute($request, array('requireAuth' => false)));
+        $this->assertNull($b->execute($request, array('requireAuth' => false)));
     }
 
     /**

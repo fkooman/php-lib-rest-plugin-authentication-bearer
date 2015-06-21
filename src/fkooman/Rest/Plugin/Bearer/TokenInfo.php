@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  Copyright 2014 François Kooman <fkooman@tuxed.net>.
+ *  Copyright 2015 François Kooman <fkooman@tuxed.net>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace fkooman\Rest\Plugin\Bearer;
 
+use fkooman\Rest\Plugin\Authentication\UserInfoInterface;
 use InvalidArgumentException;
+use RuntimeException;
 
-class TokenInfo
+class TokenInfo implements UserInfoInterface
 {
     /** @var array */
     private $response;
@@ -67,6 +70,23 @@ class TokenInfo
         }
 
         return;
+    }
+
+    public function getUserId()
+    {
+        $userIdFields = array(
+            'username',
+            'sub',
+            'me',
+        );
+
+        foreach ($userIdFields as $userIdField) {
+            if (null !== $this->get($userIdField)) {
+                return $this->get($userIdField);
+            }
+        }
+
+        throw new RuntimeException('user identifier not available from introspection endpoint');
     }
 
     public function getScope()

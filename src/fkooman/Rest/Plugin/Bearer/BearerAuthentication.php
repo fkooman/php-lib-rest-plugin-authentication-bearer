@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2014 François Kooman <fkooman@tuxed.net>.
+ * Copyright 2015 François Kooman <fkooman@tuxed.net>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace fkooman\Rest\Plugin\Bearer;
 
 use fkooman\Http\Request;
-use fkooman\Rest\ServicePluginInterface;
+use fkooman\Rest\Plugin\Authentication\AuthenticationPluginInterface;
 use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
 use UnexpectedValueException;
 
-class BearerAuthentication implements ServicePluginInterface
+class BearerAuthentication implements AuthenticationPluginInterface
 {
-    /** @var fkooman\Rest\Plugin\ValidatorInterface */
+    /** @var ValidatorInterface */
     private $validator;
 
     /** @var array */
@@ -40,92 +41,95 @@ class BearerAuthentication implements ServicePluginInterface
         $this->authParams = $authParams;
     }
 
+    public function getScheme()
+    {
+        return 'Bearer';
+    }
+
+    public function getAuthParams()
+    {
+        return $this->authParams;
+    }
+
+    public function isAttempt(Request $request)
+    {
+        $authHeader = $request->getHeader('Authorization');
+        if (null === $authHeader) {
+            return false;
+        }
+        if (!is_string($authHeader)) {
+            return false;
+        }
+        if (7 >= strlen($authHeader)) {
+            return false;
+        }
+        if (0 !== strpos($authHeader, 'Bearer ')) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function execute(Request $request, array $routeConfig)
     {
-        $requireAuth = true;
+        if ($this->isAttempt($request)) {
+            // if there is an attempt, it MUST succeed
+            $authHeader = $request->getHeader('Authorization');
+            $bearerToken = substr($authHeader, 7);
+            self::validateTokenSyntax($bearerToken);
+
+            // call the registered validator
+            $tokenInfo = $this->validator->validate($bearerToken);
+            if (!($tokenInfo instanceof TokenInfo)) {
+                throw new UnexpectedValueException('invalid response of validate method');
+            }
+
+            if (!$tokenInfo->get('active')) {
+                // not active
+                $e = new UnauthorizedException(
+                    'invalid_token',
+                    'token is invalid or expired'
+                );
+                $e->addScheme(
+                    'Bearer',
+                    array_merge(
+                        $this->authParams,
+                        array(
+                            'error' => 'invalid_token',
+                            'error_description' => 'token is invalid or expired',
+                        )
+                    )
+                );
+                throw $e;
+            }
+
+            return $tokenInfo;
+        }
+
+        // if there is no attempt, and authentication is not required,
+        // then we can let it go :)
         if (array_key_exists('requireAuth', $routeConfig)) {
             if (!$routeConfig['requireAuth']) {
-                $requireAuth = false;
+                return;
             }
         }
 
-        $headerFound = false;
-        $queryParameterFound = false;
+        $e = new UnauthorizedException(
+            'no_credentials',
+            'credentials must be provided'
+        );
+        $e->addScheme('Bearer', $this->authParams);
+        throw $e;
+    }
 
-        $authorizationHeader = $request->getHeader('Authorization');
-        if (0 === stripos($authorizationHeader, 'Bearer ')) {
-            // Bearer header found
-            $headerFound = true;
-        }
-        $queryParameter = $request->getUrl()->getQueryParameter('access_token');
-        if (null !== $queryParameter) {
-            // Query parameter found
-            $queryParameterFound = true;
-        }
-
-        if (!$headerFound && !$queryParameterFound) {
-            // none found
-            if (!$requireAuth) {
-                return false;
-            }
-            throw new UnauthorizedException(
-                'invalid_token',
-                'no token provided',
-                'Bearer',
-                $this->authParams
-            );
-        }
-        if ($headerFound && $queryParameterFound) {
-            // both found
-            throw new BadRequestException(
-                'invalid_request',
-                'token provided through both authorization header and query string'
-            );
-        }
-        if ($headerFound) {
-            $bearerToken = substr($authorizationHeader, 7);
-        } else {
-            $bearerToken = $queryParameter;
-        }
-
-        // we received a Bearer token, verify the syntax
-        if (!$this->isValidTokenSyntax($bearerToken)) {
+    public static function validateTokenSyntax($bearerToken)
+    {
+        // b64token = 1*( ALPHA / DIGIT / "-" / "." / "_" / "~" / "+" / "/" ) *"="
+        if (1 !== preg_match('|^[[:alpha:][:digit:]-._~+/]+=*$|', $bearerToken)) {
             throw new BadRequestException(
                 'invalid_request',
                 'invalid token syntax'
             );
         }
-
-        // call the registered validator
-        $tokenInfo = $this->validator->validate($bearerToken);
-        if (!($tokenInfo instanceof TokenInfo)) {
-            throw new UnexpectedValueException('invalid response of validate method');
-        }
-
-        $errorParams = array(
-            'error' => 'invalid_token',
-            'error_description' => 'token is invalid or expired',
-        );
-
-        if (!$tokenInfo->get('active')) {
-            throw new UnauthorizedException(
-                'invalid_token',
-                'token is invalid or expired',
-                'Bearer',
-                array_merge($this->authParams, $errorParams)
-            );
-        }
-
-        return $tokenInfo;
-    }
-
-    private function isValidTokenSyntax($bearerToken)
-    {
-        // b64token = 1*( ALPHA / DIGIT / "-" / "." / "_" / "~" / "+" / "/" ) *"="
-        if (1 !== preg_match('|^[[:alpha:][:digit:]-._~+/]+=*$|', $bearerToken)) {
-            return false;
-        }
-
-        return true;
     }
 }
