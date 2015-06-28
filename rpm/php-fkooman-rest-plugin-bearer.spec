@@ -5,7 +5,7 @@
 %global github_name      php-lib-rest-plugin-bearer
 
 Name:       php-%{composer_vendor}-%{composer_project}
-Version:    0.4.1
+Version:    0.5.0
 Release:    1%{?dist}
 Summary:    Bearer Authentication plugin for fkooman/rest
 
@@ -44,6 +44,9 @@ cp -pr src/* ${RPM_BUILD_ROOT}%{_datadir}/php
 %doc README.md CHANGES.md COPYING composer.json
 
 %changelog
+* Sun Jun 28 2015 François Kooman <fkooman@tuxed.net> - 0.5.0-1
+- update to 0.5.0
+
 * Thu Apr 30 2015 François Kooman <fkooman@tuxed.net> - 0.4.1-1
 - update to 0.4.1
 
