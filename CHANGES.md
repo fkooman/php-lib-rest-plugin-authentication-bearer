@@ -3,7 +3,7 @@
 ## 0.5.0
 - update `fkooman/rest`
 - update API. No longer provide the `realm` as a parameter, but specify
-  all `auth_params` as an array where `realm` is an array key.
+  all `authParams` as an array where `realm` is an array key.
 
 ## 0.4.2
 - update `fkooman/rest`
