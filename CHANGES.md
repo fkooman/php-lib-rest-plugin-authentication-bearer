@@ -1,5 +1,8 @@
 # Release History
 
+## 0.5.1
+- update spec file
+
 ## 0.5.0
 - update `fkooman/rest`
 - update API. No longer provide the `realm` as a parameter, but specify
