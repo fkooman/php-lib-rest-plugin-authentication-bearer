@@ -15,8 +15,10 @@
     "license": "Apache-2.0",
     "name": "fkooman/rest-plugin-bearer",
     "require": {
+        "ext-pcre": "*",
+        "ext-spl": "*",
         "fkooman/rest": "~0.9.0",
-        "guzzle/guzzle": "~3.9",
+        "guzzlehttp/guzzle": "~5.3",
         "php": ">=5.3.3"
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2014 François Kooman <fkooman@tuxed.net>.
+ * Copyright 2015 François Kooman <fkooman@tuxed.net>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,10 @@
 namespace fkooman\Rest\Plugin\Bearer;
 
 use fkooman\Http\Request;
-use Guzzle\Http\Client;
-use Guzzle\Plugin\Mock\MockPlugin;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Message\Response;
+use GuzzleHttp\Stream\Stream;
 use PHPUnit_Framework_TestCase;
 
 class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
@@ -39,23 +40,28 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'HTTP_AUTHORIZATION' => 'Bearer xyz',
             )
         );
-        $guzzleClient = new Client();
-        $plugin = new MockPlugin();
-        $response = new Response(200);
-        $response->setHeader('Content-Type', 'application/json');
-        $response->setBody(
-            json_encode(
-                array(
-                    'active' => true,
-                    'sub' => 'fkooman',
-                )
+
+        $client = new Client();
+        $mock = new Mock(
+            array(
+                new Response(
+                    200,
+                    array('Content-Type' => 'application/json'),
+                    Stream::factory(
+                        json_encode(
+                            array(
+                                'active' => true,
+                                'sub' => 'fkooman',
+                            )
+                        )
+                    )
+                ),
             )
         );
-        $plugin->addResponse($response);
-        $guzzleClient->addSubscriber($plugin);
+        $client->getEmitter()->attach($mock);
 
         $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
+            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $client),
             array('realm' => 'My Realm')
         );
         $tokenIntrospection = $bearerAuth->execute($request, array());
@@ -79,22 +85,27 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'HTTP_AUTHORIZATION' => 'Bearer xyz',
             )
         );
-        $guzzleClient = new Client();
-        $plugin = new MockPlugin();
-        $response = new Response(200);
-        $response->setHeader('Content-Type', 'application/json');
-        $response->setBody(
-            json_encode(
-                array(
-                        'active' => false,
-                )
+
+        $client = new Client();
+        $mock = new Mock(
+            array(
+                new Response(
+                    200,
+                    array('Content-Type' => 'application/json'),
+                    Stream::factory(
+                        json_encode(
+                            array(
+                                'active' => false,
+                            )
+                        )
+                    )
+                ),
             )
         );
-        $plugin->addResponse($response);
-        $guzzleClient->addSubscriber($plugin);
+        $client->getEmitter()->attach($mock);
 
         $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
+            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $client),
             array('realm' => 'My Realm')
         );
         $bearerAuth->execute($request, array());

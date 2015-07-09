@@ -18,7 +18,7 @@
 
 namespace fkooman\Rest\Plugin\Bearer;
 
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
 class IntrospectionBearerValidator implements ValidatorInterface
 {
@@ -28,7 +28,7 @@ class IntrospectionBearerValidator implements ValidatorInterface
     /** @var string */
     private $bearerToken;
 
-    /** @var \Guzzle\Http\Client */
+    /** @var \GuzzleHttp\Client */
     private $client;
 
     public function __construct($endpoint, $bearerToken, Client $client = null)
@@ -44,14 +44,19 @@ class IntrospectionBearerValidator implements ValidatorInterface
 
     public function validate($bearerToken)
     {
-        $request = $this->client->post(
+        $response = $this->client->post(
             $this->endpoint,
-            array('Authorization' => sprintf('Bearer %s', $this->bearerToken)),
             array(
-                'token' => $bearerToken,
+                'headers' => array(
+                    'Authorization' => sprintf('Bearer %s', $this->bearerToken),
+                    'Accept' => 'application/json',
+                ),
+                'body' => array(
+                    'token' => $bearerToken,
+                ),
             )
         );
 
-        return new TokenInfo($request->send()->json());
+        return new TokenInfo($response->json());
     }
 }
