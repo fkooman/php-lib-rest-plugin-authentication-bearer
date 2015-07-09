@@ -1,5 +1,8 @@
 # Release History
 
+## 0.5.3
+- depend on the correct version of `guzzlehttp/client` in spec file
+
 ## 0.5.2
 - update to `guzzlehttp/client`
 
