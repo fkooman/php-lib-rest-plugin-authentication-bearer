@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\Rest\Plugin\Bearer;
+namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
 use fkooman\Http\Request;
 use GuzzleHttp\Client;
@@ -219,7 +219,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 
     public function testOptionalAuthWithoutAttempt()
     {
-        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Bearer\ValidatorInterface')
+        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Authentication\Bearer\ValidatorInterface')
                      ->setMockClassName('MyValidator')
                      ->getMock();
         $stub->method('validate')
@@ -239,7 +239,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'REQUEST_METHOD' => 'GET',
             )
         );
-        $this->assertNull($b->execute($request, array('requireAuth' => false)));
+        $this->assertNull($b->execute($request, array('require' => false)));
     }
 
     /**
@@ -248,7 +248,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
      */
     public function testOptionalAuthWithAttempt()
     {
-        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Bearer\ValidatorInterface')
+        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Authentication\Bearer\ValidatorInterface')
                      ->setMockClassName('MyValidator')
                      ->getMock();
         $stub->method('validate')
@@ -268,6 +268,6 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
             ),
             array('token' => 'foo')
         );
-        $b->execute($request, array('requireAuth' => false));
+        $b->execute($request, array('require' => false));
     }
 }

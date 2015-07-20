@@ -18,19 +18,13 @@
 require_once dirname(__DIR__).'/vendor/autoload.php';
 
 use fkooman\Http\Exception\ForbiddenException;
-use fkooman\Rest\Plugin\Bearer\BearerAuthentication;
-use fkooman\Rest\Plugin\Bearer\IntrospectionUserPassValidator;
-use fkooman\Rest\Plugin\Bearer\TokenInfo;
+use fkooman\Rest\Plugin\Authentication\Bearer\BearerAuthentication;
+use fkooman\Rest\Plugin\Authentication\Bearer\IntrospectionUserPassValidator;
+use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
 use fkooman\Rest\Service;
-use fkooman\Rest\PluginRegistry;
-use fkooman\Rest\ExceptionHandler;
-
-ExceptionHandler::register();
 
 $service = new Service();
-
-$pluginRegistry = new PluginRegistry();
-$pluginRegistry->registerDefaultPlugin(
+$service->getPluginRegistry()->registerDefaultPlugin(
     new BearerAuthentication(
         new IntrospectionUserPassValidator(
             'http://localhost/php-oauth-as/introspect.php',
@@ -40,8 +34,6 @@ $pluginRegistry->registerDefaultPlugin(
         array('realm' => 'My OAuth API')
     )
 );
-$service->setPluginRegistry($pluginRegistry);
-
 $service->get(
     '/getMyUserId',
     function (TokenInfo $u) {

@@ -1,5 +1,8 @@
 # Release History
 
+## 1.0.0
+- update `fkooman/rest` and use `fkooman/rest-plugin-authentication`
+
 ## 0.5.3
 - depend on the correct version of `guzzlehttp/client` in spec file
 

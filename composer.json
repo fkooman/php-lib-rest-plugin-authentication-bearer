@@ -8,17 +8,18 @@
     ],
     "autoload": {
         "psr-0": {
-            "fkooman\\Rest\\Plugin\\Bearer\\": "src/"
+            "fkooman\\Rest\\Plugin\\Authentication\\Bearer\\": "src/"
         }
     },
     "description": "Bearer (OAuth) Authentication plugin for fkooman/rest",
     "license": "Apache-2.0",
-    "name": "fkooman/rest-plugin-bearer",
+    "name": "fkooman/rest-plugin-authentication-bearer",
     "require": {
         "ext-pcre": "*",
         "ext-spl": "*",
-        "fkooman/rest": "~0.9.0",
+        "fkooman/rest": "^1.0.0",
+        "fkooman/rest-plugin-authentication": "^1.0.0",
         "guzzlehttp/guzzle": "~5.3",
-        "php": ">=5.3.3"
+        "php": ">=5.4"
     }
 }

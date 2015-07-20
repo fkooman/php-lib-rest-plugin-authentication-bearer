@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\Rest\Plugin\Bearer;
+namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
 use fkooman\Http\Request;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPluginInterface;
@@ -26,7 +26,7 @@ use UnexpectedValueException;
 
 class BearerAuthentication implements AuthenticationPluginInterface
 {
-    /** @var \fkooman\Rest\Plugin\Bearer\ValidatorInterface */
+    /** @var fkooman\Rest\Plugin\Authentication\Bearer\ValidatorInterface */
     private $validator;
 
     /** @var array */
@@ -108,8 +108,8 @@ class BearerAuthentication implements AuthenticationPluginInterface
 
         // if there is no attempt, and authentication is not required,
         // then we can let it go :)
-        if (array_key_exists('requireAuth', $routeConfig)) {
-            if (!$routeConfig['requireAuth']) {
+        if (array_key_exists('require', $routeConfig)) {
+            if (!$routeConfig['require']) {
                 return;
             }
         }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace fkooman\Rest\Plugin\Bearer;
+namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
 use PHPUnit_Framework_TestCase;
 
