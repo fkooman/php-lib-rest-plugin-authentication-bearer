@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
 use fkooman\Http\Request;
+use fkooman\Rest\Service;
 use fkooman\Rest\Plugin\Authentication\AuthenticationPluginInterface;
 use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
@@ -41,23 +41,14 @@ class BearerAuthentication implements AuthenticationPluginInterface
         $this->authParams = $authParams;
     }
 
-    public function getScheme()
+    public function init(Service $service)
     {
-        return 'Bearer';
+        // NOP
     }
 
-    public function getAuthParams()
+    private static function isAttempt($authHeader)
     {
-        return $this->authParams;
-    }
-
-    public function isAttempt(Request $request)
-    {
-        $authHeader = $request->getHeader('Authorization');
         if (null === $authHeader) {
-            return false;
-        }
-        if (!is_string($authHeader)) {
             return false;
         }
         if (7 >= strlen($authHeader)) {
@@ -70,55 +61,54 @@ class BearerAuthentication implements AuthenticationPluginInterface
         return true;
     }
 
-    public function execute(Request $request, array $routeConfig)
+    public function isAuthenticated(Request $request)
     {
-        if ($this->isAttempt($request)) {
-            // if there is an attempt, it MUST succeed
-            $authHeader = $request->getHeader('Authorization');
-            $bearerToken = substr($authHeader, 7);
-            self::validateTokenSyntax($bearerToken);
-
-            // call the registered validator
-            $tokenInfo = $this->validator->validate($bearerToken);
-            if (!($tokenInfo instanceof TokenInfo)) {
-                throw new UnexpectedValueException('invalid response of validate method');
-            }
-
-            if (!$tokenInfo->get('active')) {
-                // not active
-                $e = new UnauthorizedException(
-                    'invalid_token',
-                    'token is invalid or expired'
-                );
-                $e->addScheme(
-                    'Bearer',
-                    array_merge(
-                        $this->authParams,
-                        array(
-                            'error' => 'invalid_token',
-                            'error_description' => 'token is invalid or expired',
-                        )
-                    )
-                );
-                throw $e;
-            }
-
-            return $tokenInfo;
+        $authHeader = $request->getHeader('Authorization');
+        if (!self::isAttempt($authHeader)) {
+            // no attempt
+            return false;
         }
 
-        // if there is no attempt, and authentication is not required,
-        // then we can let it go :)
-        if (array_key_exists('require', $routeConfig)) {
-            if (!$routeConfig['require']) {
-                return;
-            }
+        // if there is an attempt, it MUST succeed
+        $bearerToken = substr($authHeader, 7);
+        self::validateTokenSyntax($bearerToken);
+
+        // call the registered validator
+        $tokenInfo = $this->validator->validate($bearerToken);
+        if (!($tokenInfo instanceof TokenInfo)) {
+            throw new UnexpectedValueException('invalid response of validate method');
+        }
+
+        if (!$tokenInfo->get('active')) {
+            return false;
+        }
+
+        return $tokenInfo;
+    }
+
+    public function requestAuthentication(Request $request)
+    {
+        $authHeader = $request->getHeader('Authorization');
+        if (self::isAttempt($authHeader)) {
+            $error = 'invalid_token';
+            $authParams = array_merge(
+                $this->authParams,
+                array(
+                    'error' => $error,
+                )
+            );
+        } else {
+            $error = 'no_token';
+            // if there is no token provided, we should not include an
+            // error in the WWW-Authenticate header
+            $authParams = $this->authParams;
         }
 
         $e = new UnauthorizedException(
-            'no_credentials',
-            'credentials must be provided'
+            $error,
+            null    // parameter no longer needed in fkooman/http >= 1.3.1
         );
-        $e->addScheme('Bearer', $this->authParams);
+        $e->addScheme('Bearer', $authParams);
         throw $e;
     }
 

@@ -15,19 +15,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
+require_once __DIR__.'/Test/TestValidator.php';
+
 use fkooman\Http\Request;
-use GuzzleHttp\Client;
-use GuzzleHttp\Subscriber\Mock;
-use GuzzleHttp\Message\Response;
-use GuzzleHttp\Stream\Stream;
 use PHPUnit_Framework_TestCase;
+use fkooman\Rest\Plugin\Authentication\Bearer\Test\TestValidator;
 
 class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 {
-    public function testBearerValidToken()
+    public function testIsAuthenticatedValid()
+    {
+        $request = new Request(
+            array(
+                'SERVER_NAME' => 'www.example.org',
+                'SERVER_PORT' => 80,
+                'QUERY_STRING' => '',
+                'REQUEST_URI' => '/',
+                'SCRIPT_NAME' => '/index.php',
+                'REQUEST_METHOD' => 'GET',
+                'HTTP_AUTHORIZATION' => 'Bearer t_fkooman',
+            )
+        );
+
+        $auth = new BearerAuthentication(
+            new TestValidator()
+        );
+
+        $tokenInfo = $auth->isAuthenticated($request);
+        $this->assertTrue($tokenInfo->get('active'));
+        $this->assertSame('fkooman', $tokenInfo->get('sub'));
+    }
+
+    public function testIsAuthenticatedInvalid()
     {
         $request = new Request(
             array(
@@ -41,38 +62,59 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
             )
         );
 
-        $client = new Client();
-        $mock = new Mock(
+        $auth = new BearerAuthentication(
+            new TestValidator()
+        );
+        $this->assertFalse($auth->isAuthenticated($request));
+    }
+
+    public function testIsAuthenticatedNoAttempt()
+    {
+        $request = new Request(
             array(
-                new Response(
-                    200,
-                    array('Content-Type' => 'application/json'),
-                    Stream::factory(
-                        json_encode(
-                            array(
-                                'active' => true,
-                                'sub' => 'fkooman',
-                            )
-                        )
-                    )
-                ),
+                'SERVER_NAME' => 'www.example.org',
+                'SERVER_PORT' => 80,
+                'QUERY_STRING' => '',
+                'REQUEST_URI' => '/',
+                'SCRIPT_NAME' => '/index.php',
+                'REQUEST_METHOD' => 'GET',
             )
         );
-        $client->getEmitter()->attach($mock);
 
-        $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $client),
-            array('realm' => 'My Realm')
+        $auth = new BearerAuthentication(
+            new TestValidator()
         );
-        $tokenIntrospection = $bearerAuth->execute($request, array());
-        $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
+        $this->assertFalse($auth->isAuthenticated($request));
+    }
+
+    /**
+     * @expectedException fkooman\Http\Exception\UnauthorizedException
+     * @expectedExceptionMessage no_token
+     */
+    public function testRequestAuthenticationNoToken()
+    {
+        $request = new Request(
+            array(
+                'SERVER_NAME' => 'www.example.org',
+                'SERVER_PORT' => 80,
+                'QUERY_STRING' => '',
+                'REQUEST_URI' => '/',
+                'SCRIPT_NAME' => '/index.php',
+                'REQUEST_METHOD' => 'GET',
+            )
+        );
+        $auth = new BearerAuthentication(
+            new TestValidator()
+        );
+
+        $auth->requestAuthentication($request);
     }
 
     /**
      * @expectedException fkooman\Http\Exception\UnauthorizedException
      * @expectedExceptionMessage invalid_token
      */
-    public function testBearerInvalidToken()
+    public function testRequestAuthenticationInvalidToken()
     {
         $request = new Request(
             array(
@@ -85,189 +127,10 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'HTTP_AUTHORIZATION' => 'Bearer xyz',
             )
         );
-
-        $client = new Client();
-        $mock = new Mock(
-            array(
-                new Response(
-                    200,
-                    array('Content-Type' => 'application/json'),
-                    Stream::factory(
-                        json_encode(
-                            array(
-                                'active' => false,
-                            )
-                        )
-                    )
-                ),
-            )
-        );
-        $client->getEmitter()->attach($mock);
-
-        $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $client),
-            array('realm' => 'My Realm')
-        );
-        $bearerAuth->execute($request, array());
-    }
-
-    /**
-     * @expectedException fkooman\Http\Exception\UnauthorizedException
-     * @expectedExceptionMessage no_credentials
-     */
-    public function testBearerNoToken()
-    {
-        $request = new Request(
-            array(
-                'SERVER_NAME' => 'www.example.org',
-                'SERVER_PORT' => 80,
-                'QUERY_STRING' => '',
-                'REQUEST_URI' => '/',
-                'SCRIPT_NAME' => '/index.php',
-                'REQUEST_METHOD' => 'GET',
-            )
-        );
-        $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
-            array('realm' => 'My Realm')
-        );
-        $bearerAuth->execute($request, array());
-    }
-
-    /**
-     * @expectedException fkooman\Http\Exception\BadRequestException
-     * @expectedExceptionMessage invalid_request
-     */
-    public function testBearerMalformedToken()
-    {
-        $request = new Request(
-            array(
-                'SERVER_NAME' => 'www.example.org',
-                'SERVER_PORT' => 80,
-                'QUERY_STRING' => '',
-                'REQUEST_URI' => '/',
-                'SCRIPT_NAME' => '/index.php',
-                'REQUEST_METHOD' => 'GET',
-                'HTTP_AUTHORIZATION' => 'Bearer *',
-            )
-        );
-        $bearerAuth = new BearerAuthentication(
-            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
-            array('realm' => 'My Realm')
-        );
-        $bearerAuth->execute($request, array());
-    }
-
-#    public function testBearerQueryParameterToken()
-#    {
-#        $request = new Request(
-#            array(
-#                'SERVER_NAME' => 'www.example.org',
-#                'SERVER_PORT' => 80,
-#                'QUERY_STRING' => 'access_token=foo',
-#                'REQUEST_URI' => '/?access_token=foo',
-#                'SCRIPT_NAME' => '/index.php',
-#                'REQUEST_METHOD' => 'GET',
-#            )
-#        );
-#        $guzzleClient = new Client();
-#        $plugin = new MockPlugin();
-#        $response = new Response(200);
-#        $response->setHeaders(array('Content-Type' => 'application/json'));
-#        $response->setBody(
-#            json_encode(
-#                array(
-#                    'active' => true,
-#                    'sub' => 'fkooman',
-#                )
-#            )
-#        );
-#        $plugin->addResponse($response);
-#        $guzzleClient->addSubscriber($plugin);
-
-#        $bearerAuth = new BearerAuthentication(
-#            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar', $guzzleClient),
-#            array('realm' => 'My Realm')
-#        );
-#        $tokenIntrospection = $bearerAuth->execute($request, array());
-#        $this->assertEquals('fkooman', $tokenIntrospection->get('sub'));
-#    }
-
-#    /**
-#     * @expectedException fkooman\Http\Exception\BadRequestException
-#     * @expectedExceptionMessage invalid_request
-#     */
-#    public function testBearerBothHeaderAndQueryParameter()
-#    {
-#        $request = new Request(
-#            array(
-#                'SERVER_NAME' => 'www.example.org',
-#                'SERVER_PORT' => 80,
-#                'QUERY_STRING' => 'access_token=foo',
-#                'REQUEST_URI' => '/?access_token=foo',
-#                'SCRIPT_NAME' => '/index.php',
-#                'REQUEST_METHOD' => 'GET',
-#                'HTTP_AUTHORIZATION' => 'Bearer foo',
-#            )
-#        );
-#        $bearerAuth = new BearerAuthentication(
-#            new IntrospectionUserPassValidator('http://localhost/php-oauth-as/introspect.php', 'foo', 'bar'),
-#            array('realm' => 'My Realm')
-#        );
-#        $bearerAuth->execute($request, array());
-#    }
-
-    public function testOptionalAuthWithoutAttempt()
-    {
-        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Authentication\Bearer\ValidatorInterface')
-                     ->setMockClassName('MyValidator')
-                     ->getMock();
-        $stub->method('validate')
-             ->willReturn(new TokenInfo(array('active' => false)));
-
-        $b = new BearerAuthentication(
-            $stub, array('realm' => 'Realm')
+        $auth = new BearerAuthentication(
+            new TestValidator()
         );
 
-        $request = new Request(
-            array(
-                'SERVER_NAME' => 'www.example.org',
-                'SERVER_PORT' => 80,
-                'QUERY_STRING' => '',
-                'REQUEST_URI' => '/',
-                'SCRIPT_NAME' => '/index.php',
-                'REQUEST_METHOD' => 'GET',
-            )
-        );
-        $this->assertNull($b->execute($request, array('require' => false)));
-    }
-
-    /**
-     * @expectedException fkooman\Http\Exception\UnauthorizedException
-     * @expectedExceptionMessage invalid_token
-     */
-    public function testOptionalAuthWithAttempt()
-    {
-        $stub = $this->getMockBuilder('fkooman\Rest\Plugin\Authentication\Bearer\ValidatorInterface')
-                     ->setMockClassName('MyValidator')
-                     ->getMock();
-        $stub->method('validate')
-             ->willReturn(new TokenInfo(array('active' => false)));
-
-        $b = new BearerAuthentication($stub);
-
-        $request = new Request(
-            array(
-                'SERVER_NAME' => 'www.example.org',
-                'SERVER_PORT' => 80,
-                'QUERY_STRING' => '',
-                'REQUEST_URI' => '/',
-                'SCRIPT_NAME' => '/index.php',
-                'REQUEST_METHOD' => 'POST',
-                'HTTP_AUTHORIZATION' => 'Bearer xyz',
-            ),
-            array('token' => 'foo')
-        );
-        $b->execute($request, array('require' => false));
+        $auth->requestAuthentication($request);
     }
 }
