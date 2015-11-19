@@ -18,7 +18,7 @@
         "ext-pcre": "*",
         "ext-spl": "*",
         "fkooman/rest": "^1.0.0",
-        "fkooman/rest-plugin-authentication": "dev-develop",
+        "fkooman/rest-plugin-authentication": "^2.0.0",
         "guzzlehttp/guzzle": "~5.3",
         "php": ">= 5.3.0"
     }
