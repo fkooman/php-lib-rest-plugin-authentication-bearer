@@ -1,5 +1,10 @@
 # Release History
 
+## 2.1.0 (2015-12-05)
+- update dependency `fkooman/http`
+- improve testing of unauthorized requests
+- add support for query token parameter instead of only `Authorization` header
+
 ## 2.0.0 (2015-11-19)
 - major API update for new `fkooman/rest-plugin-authentication`
 

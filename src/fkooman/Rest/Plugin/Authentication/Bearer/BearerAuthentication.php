@@ -46,11 +46,8 @@ class BearerAuthentication implements AuthenticationPluginInterface
         // NOP
     }
 
-    private static function isAttempt($authHeader)
+    private static function getHeaderAccessToken($authHeader)
     {
-        if (null === $authHeader) {
-            return false;
-        }
         if (7 >= strlen($authHeader)) {
             return false;
         }
@@ -58,19 +55,35 @@ class BearerAuthentication implements AuthenticationPluginInterface
             return false;
         }
 
-        return true;
+        return substr($authHeader, 7);
+    }
+
+    private static function isAttempt($authHeader, $queryParameter)
+    {
+        $bearerToken = self::getHeaderAccessToken($authHeader);
+        if (null !== $queryParameter) {
+            if ($bearerToken) {
+                // MUST NOT have both Authorization header and query parameter
+                return false;
+            }
+            $bearerToken = $queryParameter;
+        }
+
+        return $bearerToken;
     }
 
     public function isAuthenticated(Request $request)
     {
         $authHeader = $request->getHeader('Authorization');
-        if (!self::isAttempt($authHeader)) {
-            // no attempt
+        $queryParameter = $request->getUrl()->getQueryParameter('access_token');
+
+        $bearerToken = self::isAttempt($authHeader, $queryParameter);
+        if (!$bearerToken) {
+            // no attempt or no valid attempt
             return false;
         }
 
         // if there is an attempt, it MUST succeed
-        $bearerToken = substr($authHeader, 7);
         self::validateTokenSyntax($bearerToken);
 
         // call the registered validator
@@ -89,7 +102,8 @@ class BearerAuthentication implements AuthenticationPluginInterface
     public function requestAuthentication(Request $request)
     {
         $authHeader = $request->getHeader('Authorization');
-        if (self::isAttempt($authHeader)) {
+        $queryParameter = $request->getUrl()->getQueryParameter('access_token');
+        if (self::isAttempt($authHeader, $queryParameter)) {
             $error = 'invalid_token';
             $authParams = array_merge(
                 $this->authParams,
@@ -98,15 +112,23 @@ class BearerAuthentication implements AuthenticationPluginInterface
                 )
             );
         } else {
+            if (null !== $authHeader && null !== $queryParameter) {
+                // MUST NOT have both Authorization header and query parameter
+
+                // XXX: should also include the WWW-Authenticate response header
+                // according to specification
+                throw new BadRequestException('invalid_request', 'more than one authorization method used');
+            }
+            // no attempt
             $error = 'no_token';
+
             // if there is no token provided, we should not include an
             // error in the WWW-Authenticate header
             $authParams = $this->authParams;
         }
 
         $e = new UnauthorizedException(
-            $error,
-            null    // parameter no longer needed in fkooman/http >= 1.3.1
+            $error
         );
         $e->addScheme('Bearer', $authParams);
         throw $e;
