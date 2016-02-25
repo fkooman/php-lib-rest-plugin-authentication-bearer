@@ -1,5 +1,9 @@
 # Release History
 
+## 2.2.0 (2016-02-25)
+- add `ArrayBearerValidator` to validate provided Bearer token in an array
+  of valid Bearer tokens in a time-constant way
+
 ## 2.1.0 (2015-12-05)
 - update dependency `fkooman/http`
 - improve testing of unauthorized requests
