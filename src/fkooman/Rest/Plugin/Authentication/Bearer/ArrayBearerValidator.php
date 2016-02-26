@@ -16,6 +16,8 @@
  */
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
+use RuntimeException;
+
 class ArrayBearerValidator implements ValidatorInterface
 {
     /** @var array */
@@ -39,11 +41,26 @@ class ArrayBearerValidator implements ValidatorInterface
         // information about the valid tokens, we can return as soon as we 
         // found a match because all non-matching tokens will take exactly the 
         // same amount of time to find them, i.e. loop through all
-        foreach ($this->bearerTokens as $t) {
-            if (self::hashEquals($t, $bearerToken)) {
-                return new TokenInfo(
-                    ['active' => true]
-                );
+        foreach ($this->bearerTokens as $k => $v) {
+            if (is_array($v)) {
+                if (!array_key_exists('token', $v) || empty($v['token'])) {
+                    throw new RuntimeException(sprintf('no token configured for "%s"', $k));
+                }
+
+                if (self::hashEquals($v['token'], $bearerToken)) {
+                    $scope = array_key_exists('scope', $v) ? $v['scope'] : '';
+
+                    return new TokenInfo(
+                        ['active' => true, 'scope' => $scope, 'username' => $k]
+                    );
+                }
+            } else {
+                // XXX: DEPRECATED
+                if (self::hashEquals($v, $bearerToken)) {
+                    return new TokenInfo(
+                        ['active' => true]
+                    );
+                }
             }
         }
 

@@ -38,4 +38,71 @@ class ArrayBearerValidatorTest extends PHPUnit_Framework_TestCase
         ]);
         $this->assertFalse($v->validate('44445555')->get('active'));
     }
+
+    public function testValidArrayScopeFormat()
+    {
+        $v = new ArrayBearerValidator(
+            [
+                'foo' => [
+                    'token' => 'abcdef',
+                    'scope' => 'foo bar',
+                ],
+                'bar' => [
+                    'token' => 'fedcba',
+                    'scope' => 'baz',
+                ],
+            ]
+        );
+        $tokenInfo = $v->validate('abcdef');
+        $this->assertTrue($tokenInfo->get('active'));
+        $this->assertSame('foo bar', $tokenInfo->get('scope'));
+        $this->assertSame('foo', $tokenInfo->get('username'));
+    }
+
+    public function testInvalidArrayScopeFormat()
+    {
+        $v = new ArrayBearerValidator(
+            [
+                'foo' => [
+                    'token' => 'abcdef',
+                    'scope' => 'foo bar',
+                ],
+                'bar' => [
+                    'token' => 'fedcba',
+                    'scope' => 'baz',
+                ],
+            ]
+        );
+        $this->assertFalse($v->validate('aabbcc')->get('active'));
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage no token configured for "foo"
+     */
+    public function testInvalidArrayScope()
+    {
+        $v = new ArrayBearerValidator(
+            [
+                'foo' => [
+                    'scope' => 'foo bar',
+                ],
+            ]
+        );
+        $v->validate('aabbcc');
+    }
+
+    public function testNoScopeArrayScope()
+    {
+        $v = new ArrayBearerValidator(
+            [
+                'foo' => [
+                    'token' => 'aabbcc',
+                ],
+            ]
+        );
+        $tokenInfo = $v->validate('aabbcc');
+        $this->assertTrue($tokenInfo->get('active'));
+        $this->assertSame('', $tokenInfo->get('scope'));
+    }
 }

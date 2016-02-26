@@ -1,5 +1,9 @@
 # Release History
 
+## 2.3.0 (2016-02-26)
+- update `ArrayBearerValidator` to also allow specifying 'scope' in addition
+  to 'token'
+
 ## 2.2.0 (2016-02-25)
 - add `ArrayBearerValidator` to validate provided Bearer token in an array
   of valid Bearer tokens in a time-constant way
