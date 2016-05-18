@@ -15,9 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
 use InvalidArgumentException;
+use fkooman\Http\Exception\ForbiddenException;
 
 class Scope
 {
@@ -60,6 +62,17 @@ class Scope
         $this->validateScopeToken($scopeToken);
 
         return in_array($scopeToken, $this->scope);
+    }
+
+    public function requireScope(array $scopeTokens)
+    {
+        foreach ($scopeTokens as $scopeToken) {
+            if ($this->hasScope($scopeToken)) {
+                return;
+            }
+        }
+
+        throw new ForbiddenException('insufficient_scope', sprintf('any of "%s" required', implode(',', $scopeTokens)));
     }
 
     public function toArray()

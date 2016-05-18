@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
 use InvalidArgumentException;
@@ -29,6 +30,23 @@ class ScopeTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($s->hasScope('write'));
         $this->assertTrue($s->hasScope('foo'));
         $this->assertFalse($s->hasScope('bar'));
+    }
+
+    public function testRequireScope()
+    {
+        $s = new Scope('foo bar baz');
+        $this->assertNull($s->requireScope(['foo']));   // has foo
+        $this->assertNull($s->requireScope(['oof', 'baz'])); // has baz
+    }
+
+    /**
+     * @expectedException \fkooman\Http\Exception\ForbiddenException
+     * @expectedExceptionMessage insufficient_scope
+     */
+    public function testRequireScopeFail()
+    {
+        $s = new Scope('foo bar baz');
+        $this->assertNull($s->requireScope(['oof', 'zab']));   // has none
     }
 
     public function testEmptyScope()

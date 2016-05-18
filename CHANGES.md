@@ -1,5 +1,9 @@
 # Release History
 
+## 2.4.0 (2016-05-18)
+- add `requireScope` method to `Scope` class to easily enforce a certain scope
+  without having to use `hasScope`
+
 ## 2.3.0 (2016-02-26)
 - update `ArrayBearerValidator` to also allow specifying 'scope' in addition
   to 'token'
