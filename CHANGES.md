@@ -1,5 +1,8 @@
 # Release History
 
+## 3.0.0 (2016-08-19)
+- update `fkooman/rest` and `fkooman/http` dependencies
+
 ## 2.4.0 (2016-05-18)
 - add `requireScope` method to `Scope` class to easily enforce a certain scope
   without having to use `hasScope`
