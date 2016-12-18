@@ -24,6 +24,8 @@ use fkooman\Rest\Plugin\Authentication\AuthenticationPluginInterface;
 use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
 use UnexpectedValueException;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 class BearerAuthentication implements AuthenticationPluginInterface
 {
@@ -33,13 +35,20 @@ class BearerAuthentication implements AuthenticationPluginInterface
     /** @var array */
     private $authParams;
 
-    public function __construct(ValidatorInterface $validator, $authParams = array())
+    /** @var \Psr\Log\LoggerInterface */
+    private $logger;
+
+    public function __construct(ValidatorInterface $validator, $authParams = array(), LoggerInterface $logger = null)
     {
         $this->validator = $validator;
         if (!array_key_exists('realm', $authParams)) {
             $authParams['realm'] = 'Protected Resource';
         }
         $this->authParams = $authParams;
+        if(is_null($logger)) {
+            $logger = new NullLogger();
+        }
+        $this->logger = $logger;
     }
 
     public function init(Service $service)
@@ -94,6 +103,8 @@ class BearerAuthentication implements AuthenticationPluginInterface
         }
 
         if (!$tokenInfo->get('active')) {
+            $this->logger->notice('invalid bearer token');
+
             return false;
         }
 

@@ -1,5 +1,8 @@
 # Release History
 
+## 3.0.1 (2016-12-18)
+- implement basic logging
+
 ## 3.0.0 (2016-08-19)
 - update `fkooman/rest` and `fkooman/http` dependencies
 
