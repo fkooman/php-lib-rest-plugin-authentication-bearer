@@ -46,15 +46,15 @@ class IntrospectionBearerValidator implements ValidatorInterface
     {
         $response = $this->client->post(
             $this->endpoint,
-            array(
-                'headers' => array(
+            [
+                'headers' => [
                     'Authorization' => sprintf('Bearer %s', $this->bearerToken),
                     'Accept' => 'application/json',
-                ),
-                'body' => array(
+                ],
+                'body' => [
                     'token' => $bearerToken,
-                ),
-            )
+                ],
+            ]
         );
 
         return new TokenInfo($response->json());

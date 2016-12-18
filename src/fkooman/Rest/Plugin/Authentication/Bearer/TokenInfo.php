@@ -29,7 +29,7 @@ class TokenInfo implements UserInfoInterface
 
     public function __construct(array $response)
     {
-        $supportedFields = array(
+        $supportedFields = [
             'active' => 'is_bool',      // REQUIRED
             'username' => 'is_string',
             'client_id' => 'is_string',
@@ -42,7 +42,7 @@ class TokenInfo implements UserInfoInterface
             'aud' => 'is_string',
             'iss' => 'is_string',
             'jti' => 'is_string',
-        );
+        ];
 
         // active key MUST exist
         if (!array_key_exists('active', $response)) {
@@ -74,11 +74,11 @@ class TokenInfo implements UserInfoInterface
 
     public function getUserId()
     {
-        $userIdFields = array(
+        $userIdFields = [
             'username',
             'sub',
             'me',
-        );
+        ];
 
         foreach ($userIdFields as $userIdField) {
             if (null !== $this->get($userIdField)) {

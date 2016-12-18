@@ -24,7 +24,7 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
 {
     public function testNotActive()
     {
-        $t = new TokenInfo(array('active' => false));
+        $t = new TokenInfo(['active' => false]);
         $this->assertFalse($t->get('active'));
     }
 
@@ -33,7 +33,7 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
         $now = time();
 
         $t = new TokenInfo(
-            array(
+            [
                 'active' => true,
                 'exp' => $now + 1000,
                 'iat' => $now - 1000,
@@ -42,8 +42,8 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
                 'aud' => 'foobar',
                 'scope' => 'foo bar baz',
                 'token_type' => 'bearer',
-                'x-ext' => array('proprietary', 'extension', 'data'),
-            )
+                'x-ext' => ['proprietary', 'extension', 'data'],
+            ]
         );
         $this->assertTrue($t->get('active'));
         $this->assertEquals($now + 1000, $t->get('exp'));
@@ -57,36 +57,36 @@ class TokenInfoTest extends PHPUnit_Framework_TestCase
 
     public function testActive()
     {
-        $t = new TokenInfo(array('active' => true));
+        $t = new TokenInfo(['active' => true]);
         $this->assertTrue($t->get('active'));
         // non exiting key should return null
         $this->assertNull($t->get('sub'));
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage active key missing
      */
     public function testMissingActive()
     {
-        $t = new TokenInfo(array());
+        $t = new TokenInfo([]);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "iat" fails "is_int" check
      */
     public function testNonIntIssueTime()
     {
-        $t = new TokenInfo(array('active' => true, 'iat' => '1234567'));
+        $t = new TokenInfo(['active' => true, 'iat' => '1234567']);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage "scope" fails "is_string" check
      */
     public function testNonStringScope()
     {
-        $t = new TokenInfo(array('active' => true, 'scope' => 123));
+        $t = new TokenInfo(['active' => true, 'scope' => 123]);
     }
 }

@@ -18,8 +18,8 @@
 
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
-use InvalidArgumentException;
 use fkooman\Http\Exception\ForbiddenException;
+use InvalidArgumentException;
 
 class Scope
 {
@@ -29,13 +29,13 @@ class Scope
     public function __construct($scope = null)
     {
         if (null === $scope) {
-            $this->scope = array();
+            $this->scope = [];
         } else {
             if (!is_string($scope)) {
                 throw new InvalidArgumentException('argument must be string');
             }
             if (0 === strlen($scope)) {
-                $this->scope = array();
+                $this->scope = [];
             } else {
                 $scopeTokens = explode(' ', $scope);
                 foreach ($scopeTokens as $token) {
@@ -47,14 +47,9 @@ class Scope
         }
     }
 
-    private function validateScopeToken($scopeToken)
+    public function __toString()
     {
-        if (!is_string($scopeToken) || 0 >= strlen($scopeToken)) {
-            throw new InvalidArgumentException('scope token must be a non-empty string');
-        }
-        if (1 !== preg_match('/^(?:\x21|[\x23-\x5B]|[\x5D-\x7E])+$/', $scopeToken)) {
-            throw new InvalidArgumentException('invalid characters in scope token');
-        }
+        return $this->toString();
     }
 
     public function hasScope($scopeToken)
@@ -85,8 +80,13 @@ class Scope
         return implode(' ', $this->scope);
     }
 
-    public function __toString()
+    private function validateScopeToken($scopeToken)
     {
-        return $this->toString();
+        if (!is_string($scopeToken) || 0 >= strlen($scopeToken)) {
+            throw new InvalidArgumentException('scope token must be a non-empty string');
+        }
+        if (1 !== preg_match('/^(?:\x21|[\x23-\x5B]|[\x5D-\x7E])+$/', $scopeToken)) {
+            throw new InvalidArgumentException('invalid characters in scope token');
+        }
     }
 }

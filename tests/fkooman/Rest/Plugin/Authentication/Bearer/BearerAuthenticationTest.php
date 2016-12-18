@@ -20,17 +20,17 @@ namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
 require_once __DIR__.'/Test/TestValidator.php';
 
-use fkooman\Http\Request;
-use PHPUnit_Framework_TestCase;
-use fkooman\Rest\Plugin\Authentication\Bearer\Test\TestValidator;
 use fkooman\Http\Exception\UnauthorizedException;
+use fkooman\Http\Request;
+use fkooman\Rest\Plugin\Authentication\Bearer\Test\TestValidator;
+use PHPUnit_Framework_TestCase;
 
 class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
 {
     public function testIsAuthenticatedValid()
     {
         $request = new Request(
-            array(
+            [
                 'SERVER_NAME' => 'www.example.org',
                 'SERVER_PORT' => 80,
                 'QUERY_STRING' => '',
@@ -38,7 +38,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'SCRIPT_NAME' => '/index.php',
                 'REQUEST_METHOD' => 'GET',
                 'HTTP_AUTHORIZATION' => 'Bearer t_fkooman',
-            )
+            ]
         );
 
         $auth = new BearerAuthentication(
@@ -53,14 +53,14 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testIsAuthenticatedValidQueryParameter()
     {
         $request = new Request(
-            array(
+            [
                 'SERVER_NAME' => 'www.example.org',
                 'SERVER_PORT' => 80,
                 'QUERY_STRING' => 'access_token=t_fkooman',
                 'REQUEST_URI' => '/?access_token=t_fkooman',
                 'SCRIPT_NAME' => '/index.php',
                 'REQUEST_METHOD' => 'GET',
-            )
+            ]
         );
 
         $auth = new BearerAuthentication(
@@ -75,7 +75,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testIsAuthenticatedInvalid()
     {
         $request = new Request(
-            array(
+            [
                 'SERVER_NAME' => 'www.example.org',
                 'SERVER_PORT' => 80,
                 'QUERY_STRING' => '',
@@ -83,7 +83,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'SCRIPT_NAME' => '/index.php',
                 'REQUEST_METHOD' => 'GET',
                 'HTTP_AUTHORIZATION' => 'Bearer xyz',
-            )
+            ]
         );
 
         $auth = new BearerAuthentication(
@@ -95,14 +95,14 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testIsAuthenticatedInvalidQueryParameter()
     {
         $request = new Request(
-            array(
+            [
                 'SERVER_NAME' => 'www.example.org',
                 'SERVER_PORT' => 80,
                 'QUERY_STRING' => 'access_token=xyz',
                 'REQUEST_URI' => '/?access_token=xyz',
                 'SCRIPT_NAME' => '/index.php',
                 'REQUEST_METHOD' => 'GET',
-            )
+            ]
         );
 
         $auth = new BearerAuthentication(
@@ -114,14 +114,14 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testIsAuthenticatedNoAttempt()
     {
         $request = new Request(
-            array(
+            [
                 'SERVER_NAME' => 'www.example.org',
                 'SERVER_PORT' => 80,
                 'QUERY_STRING' => '',
                 'REQUEST_URI' => '/',
                 'SCRIPT_NAME' => '/index.php',
                 'REQUEST_METHOD' => 'GET',
-            )
+            ]
         );
 
         $auth = new BearerAuthentication(
@@ -133,20 +133,20 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testRequestAuthenticationNoToken()
     {
         $request = new Request(
-            array(
+            [
                 'SERVER_NAME' => 'www.example.org',
                 'SERVER_PORT' => 80,
                 'QUERY_STRING' => '',
                 'REQUEST_URI' => '/',
                 'SCRIPT_NAME' => '/index.php',
                 'REQUEST_METHOD' => 'GET',
-            )
+            ]
         );
         $auth = new BearerAuthentication(
             new TestValidator(),
-            array(
+            [
                 'my_var' => 'foo',
-            )
+            ]
         );
 
         try {
@@ -154,14 +154,14 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
             $this->assertTrue(false);
         } catch (UnauthorizedException $e) {
             $this->assertSame(
-                array(
+                [
                     'HTTP/1.1 401 Unauthorized',
                     'Content-Type: application/json',
                     'Content-Length: 20',
                     'Www-Authenticate: Bearer my_var="foo",realm="Protected Resource"',
                     '',
                     '{"error":"no_token"}',
-                ),
+                ],
                 $e->getJsonResponse()->toArray()
             );
         }
@@ -170,7 +170,7 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
     public function testRequestAuthenticationInvalidToken()
     {
         $request = new Request(
-            array(
+            [
                 'SERVER_NAME' => 'www.example.org',
                 'SERVER_PORT' => 80,
                 'QUERY_STRING' => '',
@@ -178,13 +178,13 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
                 'SCRIPT_NAME' => '/index.php',
                 'REQUEST_METHOD' => 'GET',
                 'HTTP_AUTHORIZATION' => 'Bearer xyz',
-            )
+            ]
         );
         $auth = new BearerAuthentication(
             new TestValidator(),
-            array(
+            [
                 'my_var' => 'foo',
-            )
+            ]
         );
 
         try {
@@ -192,14 +192,14 @@ class BearerAuthenticationTest extends PHPUnit_Framework_TestCase
             $this->assertTrue(false);
         } catch (UnauthorizedException $e) {
             $this->assertSame(
-                array(
+                [
                     'HTTP/1.1 401 Unauthorized',
                     'Content-Type: application/json',
                     'Content-Length: 25',
                     'Www-Authenticate: Bearer my_var="foo",realm="Protected Resource",error="invalid_token"',
                     '',
                     '{"error":"invalid_token"}',
-                ),
+                ],
                 $e->getJsonResponse()->toArray()
             );
         }

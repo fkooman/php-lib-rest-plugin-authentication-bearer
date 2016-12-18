@@ -18,7 +18,6 @@
 
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
-use InvalidArgumentException;
 use PHPUnit_Framework_TestCase;
 
 class ScopeTest extends PHPUnit_Framework_TestCase
@@ -56,7 +55,7 @@ class ScopeTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage invalid characters in scope token
      */
     public function testInvalidScopeToken()
@@ -65,7 +64,7 @@ class ScopeTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage scope token must be a non-empty string
      */
     public function testEmptyArrayScope()
@@ -74,7 +73,7 @@ class ScopeTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage argument must be string
      */
     public function testNonStringFromString()
@@ -88,11 +87,11 @@ class ScopeTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('bar baz foo', $s->toString());
         $this->assertEquals('bar baz foo', $s);
         $this->assertEquals(
-            array(
+            [
                 'bar',
                 'baz',
                 'foo',
-            ),
+            ],
             $s->toArray()
         );
     }

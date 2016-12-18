@@ -38,9 +38,9 @@ class ArrayBearerValidator implements ValidatorInterface
     public function validate($bearerToken)
     {
         // we loop through all valid bearer tokens and try to find the one
-        // provided; we perform a timing safe compare to not leak any 
-        // information about the valid tokens, we can return as soon as we 
-        // found a match because all non-matching tokens will take exactly the 
+        // provided; we perform a timing safe compare to not leak any
+        // information about the valid tokens, we can return as soon as we
+        // found a match because all non-matching tokens will take exactly the
         // same amount of time to find them, i.e. loop through all
         foreach ($this->bearerTokens as $k => $v) {
             if (is_array($v)) {
@@ -87,13 +87,14 @@ class ArrayBearerValidator implements ValidatorInterface
 
         return self::timingSafeEquals($safe, $user);
     }
+
     /**
      * A timing safe equals comparison.
      *
      * @param string $safe The internal (safe) value to be checked
      * @param string $user The user submitted (unsafe) value
      *
-     * @return bool True if the two strings are identical.
+     * @return bool true if the two strings are identical
      *
      * @see http://blog.ircmaxell.com/2014/11/its-all-about-time.html
      */

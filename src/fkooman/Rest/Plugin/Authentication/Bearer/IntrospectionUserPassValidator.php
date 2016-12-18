@@ -50,17 +50,17 @@ class IntrospectionUserPassValidator implements ValidatorInterface
     {
         $response = $this->client->post(
             $this->endpoint,
-            array(
-                'body' => array(
+            [
+                'body' => [
                     'token' => $bearerToken,
-                ),
-                'headers' => array(
+                ],
+                'headers' => [
                     'Accept' => 'application/json',
-                ),
-                'auth' => array(
+                ],
+                'auth' => [
                     $this->userid, $this->password,
-                ),
-            )
+                ],
+            ]
         );
 
         return new TokenInfo($response->json());

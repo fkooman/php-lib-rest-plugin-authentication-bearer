@@ -18,8 +18,8 @@
 
 namespace fkooman\Rest\Plugin\Authentication\Bearer\Test;
 
-use fkooman\Rest\Plugin\Authentication\Bearer\ValidatorInterface;
 use fkooman\Rest\Plugin\Authentication\Bearer\TokenInfo;
+use fkooman\Rest\Plugin\Authentication\Bearer\ValidatorInterface;
 
 class TestValidator implements ValidatorInterface
 {
@@ -27,18 +27,18 @@ class TestValidator implements ValidatorInterface
     {
         if ('t_fkooman' === $bearerToken) {
             return new TokenInfo(
-                array(
+                [
                     'active' => true,
                     'sub' => 'fkooman',
-                )
+                ]
             );
         }
 
         // assume not active
         return new TokenInfo(
-            array(
+            [
                 'active' => false,
-            )
+            ]
         );
     }
 }

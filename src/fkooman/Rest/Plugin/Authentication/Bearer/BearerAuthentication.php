@@ -18,14 +18,14 @@
 
 namespace fkooman\Rest\Plugin\Authentication\Bearer;
 
-use fkooman\Http\Request;
-use fkooman\Rest\Service;
-use fkooman\Rest\Plugin\Authentication\AuthenticationPluginInterface;
-use fkooman\Http\Exception\UnauthorizedException;
 use fkooman\Http\Exception\BadRequestException;
-use UnexpectedValueException;
+use fkooman\Http\Exception\UnauthorizedException;
+use fkooman\Http\Request;
+use fkooman\Rest\Plugin\Authentication\AuthenticationPluginInterface;
+use fkooman\Rest\Service;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use UnexpectedValueException;
 
 class BearerAuthentication implements AuthenticationPluginInterface
 {
@@ -38,14 +38,14 @@ class BearerAuthentication implements AuthenticationPluginInterface
     /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
-    public function __construct(ValidatorInterface $validator, $authParams = array(), LoggerInterface $logger = null)
+    public function __construct(ValidatorInterface $validator, $authParams = [], LoggerInterface $logger = null)
     {
         $this->validator = $validator;
         if (!array_key_exists('realm', $authParams)) {
             $authParams['realm'] = 'Protected Resource';
         }
         $this->authParams = $authParams;
-        if(is_null($logger)) {
+        if (is_null($logger)) {
             $logger = new NullLogger();
         }
         $this->logger = $logger;
@@ -54,32 +54,6 @@ class BearerAuthentication implements AuthenticationPluginInterface
     public function init(Service $service)
     {
         // NOP
-    }
-
-    private static function getHeaderAccessToken($authHeader)
-    {
-        if (7 >= strlen($authHeader)) {
-            return false;
-        }
-        if (0 !== strpos($authHeader, 'Bearer ')) {
-            return false;
-        }
-
-        return substr($authHeader, 7);
-    }
-
-    private static function isAttempt($authHeader, $queryParameter)
-    {
-        $bearerToken = self::getHeaderAccessToken($authHeader);
-        if (null !== $queryParameter) {
-            if ($bearerToken) {
-                // MUST NOT have both Authorization header and query parameter
-                return false;
-            }
-            $bearerToken = $queryParameter;
-        }
-
-        return $bearerToken;
     }
 
     public function isAuthenticated(Request $request)
@@ -119,9 +93,9 @@ class BearerAuthentication implements AuthenticationPluginInterface
             $error = 'invalid_token';
             $authParams = array_merge(
                 $this->authParams,
-                array(
+                [
                     'error' => $error,
-                )
+                ]
             );
         } else {
             if (null !== $authHeader && null !== $queryParameter) {
@@ -155,5 +129,31 @@ class BearerAuthentication implements AuthenticationPluginInterface
                 'invalid token syntax'
             );
         }
+    }
+
+    private static function getHeaderAccessToken($authHeader)
+    {
+        if (7 >= strlen($authHeader)) {
+            return false;
+        }
+        if (0 !== strpos($authHeader, 'Bearer ')) {
+            return false;
+        }
+
+        return substr($authHeader, 7);
+    }
+
+    private static function isAttempt($authHeader, $queryParameter)
+    {
+        $bearerToken = self::getHeaderAccessToken($authHeader);
+        if (null !== $queryParameter) {
+            if ($bearerToken) {
+                // MUST NOT have both Authorization header and query parameter
+                return false;
+            }
+            $bearerToken = $queryParameter;
+        }
+
+        return $bearerToken;
     }
 }
